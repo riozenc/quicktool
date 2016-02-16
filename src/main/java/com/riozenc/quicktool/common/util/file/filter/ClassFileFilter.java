@@ -10,12 +10,12 @@ import java.io.File;
 import java.io.FileFilter;
 
 public class ClassFileFilter {
-	public static FileFilter getFilter(final boolean recursive) {
+	public static FileFilter getFilter(final boolean recursive, final String fileType) {
 
 		return new FileFilter() {
 
 			public boolean accept(File file) {
-				return (recursive && file.isDirectory()) || file.getName().endsWith("class");
+				return (recursive && file.isDirectory()) || file.getName().endsWith(fileType);
 			}
 		};
 	}
