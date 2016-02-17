@@ -34,7 +34,7 @@ public class FileIoUtil {
 	}
 
 	// 过滤器
-	private static FileFilter filenameFilter = ClassFileFilter.getFilter(recursive);
+	private static FileFilter filenameFilter = ClassFileFilter.getFilter(recursive, "class");
 
 	/**
 	 * 获得包下面的所有的class
