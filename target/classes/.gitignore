@@ -1,1 +1,5 @@
 /com/
+/config.properties
+/log4j2.xml
+/mybatis-config.xml
+/META-INF/

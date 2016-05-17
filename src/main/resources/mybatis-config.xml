@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<properties resource="config.properties" />
+
+	<settings>
+		<setting name="lazyLoadingEnabled" value="true" />
+		<setting name="mapUnderscoreToCamelCase" value="true" />
+		<setting name="cacheEnabled" value="true" />
+		<setting name="logImpl" value="LOG4J2" />
+		<setting name="jdbcTypeForNull" value="NULL" />
+	</settings>
+
+	<typeAliases>
+		<!-- 营销 -->
+		<typeAlias alias="BdzDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.marketing.ba.BdzDomain" />
+		<typeAlias alias="ByqDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.marketing.ba.ByqDomain" />
+		<typeAlias alias="CjqDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.marketing.ba.CjqDomain" />
+		<typeAlias alias="JldybyqgxDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.marketing.ba.JldybyqgxDomain" />
+		<typeAlias alias="KhdaDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.marketing.ba.KhdaDomain" />
+		<typeAlias alias="KhgxdaDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.marketing.ba.KhgxdaDomain" />
+		<typeAlias alias="TqDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.marketing.ba.TqDomain" />
+		<typeAlias alias="XlDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.marketing.ba.XlDomain" />
+		<typeAlias alias="YxdnbDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.marketing.ba.YxdnbDomain" />
+		<typeAlias alias="YxzdDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.marketing.ba.YxzdDomain" />
+		<typeAlias alias="DataLogDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.marketing.log.DataLogDomain" />
+		<typeAlias alias="FszzjgDomain"
+		    type="com.wisdom.gy.interactionMarketing.app.domain.marketing.ba.FszzjgDomain"  />
+
+		<!-- 计量 -->
+		<typeAlias alias="SubsDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.local.g.SubsDomain" />
+		<typeAlias alias="LineDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.local.g.LineDomain" />
+		<typeAlias alias="TranDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.local.g.TranDomain" />
+		<typeAlias alias="ConsDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.local.c.ConsDomain" />
+		<typeAlias alias="TgDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.local.g.TgDomain" />
+		<typeAlias alias="LineTgRelaDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.local.g.LineTgRelaDomain" />
+		<typeAlias alias="TmnlDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.local.d.TmnlDomain" />
+		<typeAlias alias="TmnlRunDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.local.r.TmnlRunDomain" />
+		<typeAlias alias="SimCardDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.local.p.SimCardDomain" />
+		<typeAlias alias="CpDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.local.r.CpDomain" />
+		<typeAlias alias="CpCommParaDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.local.r.CpCommParaDomain" />
+		<typeAlias alias="MeterDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.local.d.MeterDomain" />
+		<typeAlias alias="MeterRunDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.local.c.MeterRunDomain" />
+		<typeAlias alias="MpedDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.local.p.MpedDomain" />
+		<typeAlias alias="DevIrDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.local.s.DevIrDomain" />
+
+		<typeAlias alias="WorkOrderDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.local.s.WorkOrderDomain" />
+		<typeAlias alias="WorkOrderDetailDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.local.s.WorkOrderDetailDomain" />
+	    <typeAlias alias="OrgDomain"
+	        type="com.wisdom.gy.interactionMarketing.app.domain.local.o.OrgDomain"  />
+
+		<typeAlias alias="PowercutWorkOrderDetailDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.local.s.PowercutWorkOrderDetailDomain" />
+		<typeAlias alias="PowercutWorkOrderDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.local.s.PowercutWorkOrderDomain" />
+		<typeAlias alias="ArchiveVerifyDomain"
+			type="com.wisdom.gy.interactionMarketing.app.domain.local.g.ArchiveVerifyDomain" />
+
+	</typeAliases>
+
+	<environments default="gy_jl">
+		<environment id="gy_jl">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="${driver}" />
+				<property name="url" value="${url}" />
+				<property name="username" value="${username}" />
+				<property name="password" value="${password}" />
+				<!-- 是否启用侦测查询。若开启，也必须使用一个可执行的 SQL 语句设置 poolPingQuery 属性（最好是一个非常快的 SQL），默认值：false。 -->
+				<property name="poolPingEnabled" value="${poolPingEnabled}"></property>
+				<!-- 发送到数据库的侦测查询，用来检验连接是否处在正常工作秩序中并准备接受请求。默认是“NO PING QUERY SET”，这会导致多数数据库驱动失败时带有一个恰当的错误消息。 -->
+				<property name="poolPingQuery" value="${poolPingQuery}"></property>
+				<!-- 在任意时间可以存在的活动（也就是正在使用）连接数量，默认值：10 -->
+				<property name="poolMaximumActiveConnections" value="${poolMaximumActiveConnections}" />
+				<!-- 任意时间可能存在的空闲连接数 -->
+				<property name="poolMaximumIdleConnections" value="${poolMaximumIdleConnections}"></property>
+				<!-- 在被强制返回之前，池中连接被检出（checked out）时间，默认值：20000 毫秒（即 20 秒） -->
+				<property name="poolMaximumCheckoutTime" value="${poolMaximumCheckoutTime}"></property>
+			</dataSource>
+		</environment>
+	</environments>
+
+	<mappers>
+
+		<!-- 营销 -->
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/marketing/ba/BdzDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/marketing/ba/ByqDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/marketing/ba/CjqDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/marketing/ba/JldybyqgxDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/marketing/ba/KhdaDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/marketing/ba/KhgxdaDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/marketing/ba/TqDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/marketing/ba/XlDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/marketing/ba/YxdnbDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/marketing/ba/YxzdDAO.xml" />
+
+
+		<!-- TEMP -->
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/marketing/ba/temp/BdzTempDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/marketing/ba/temp/ByqTempDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/marketing/ba/temp/CjqTempDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/marketing/ba/temp/JldybyqgxTempDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/marketing/ba/temp/KhdaTempDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/marketing/ba/temp/KhgxdaTempDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/marketing/ba/temp/TqTempDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/marketing/ba/temp/XlTempDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/marketing/ba/temp/YxdnbTempDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/marketing/ba/temp/YxzdTempDAO.xml" />
+
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/marketing/log/DataLogDAO.xml" />
+
+
+		<!-- 计量 -->
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/local/g/SubsDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/local/g/LineDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/local/g/TranDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/local/c/ConsDAO.xml" />
+		<mapper resource="com/wisdom/gy/interactionMarketing/app/dao/local/g/TgDAO.xml" />
+
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/local/g/LineTgRelaDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/local/d/TmnlDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/local/r/TmnlRunDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/local/p/SimCardDAO.xml" />
+		<mapper resource="com/wisdom/gy/interactionMarketing/app/dao/local/r/CpDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/local/r/CpCommParaDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/local/d/MeterDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/local/c/MeterRunDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/local/p/MpedDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/local/s/DevIrDAO.xml" />
+
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/local/s/WorkOrderDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/local/s/WorkOrderDetailDAO.xml" />
+		<mapper  
+		    resource="com/wisdom/gy/interactionMarketing/app/dao/local/o/OrgDAO.xml"  />	
+			
+
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/local/s/PowercutWorkOrderDAO.xml" />
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/local/s/PowercutWorkOrderDetailDAO.xml" />
+
+		<mapper
+			resource="com/wisdom/gy/interactionMarketing/app/dao/local/g/ArchiveVerifyDAO.xml" />
+
+	</mappers>
+
+
+
+</configuration>
