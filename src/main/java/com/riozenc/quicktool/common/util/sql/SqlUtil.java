@@ -17,9 +17,9 @@ import java.util.logging.Logger;
 import com.riozenc.quicktool.annotation.DateAnnotation;
 import com.riozenc.quicktool.cache.reflect.ClassCache;
 import com.riozenc.quicktool.cache.reflect.entity.ClassEntity;
-import com.riozenc.quicktool.common.util.DateUtil;
 import com.riozenc.quicktool.common.util.StringUtil;
 import com.riozenc.quicktool.common.util.annotation.FieldAnnotationUtil;
+import com.riozenc.quicktool.common.util.date.DateUtil;
 import com.riozenc.quicktool.common.util.reflect.MethodGen;
 
 public class SqlUtil {

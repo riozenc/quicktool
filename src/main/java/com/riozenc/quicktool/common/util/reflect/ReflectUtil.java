@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.riozenc.quicktool.common.util.DateUtil;
+import com.riozenc.quicktool.common.util.date.DateUtil;
 
 public class ReflectUtil {
 
