@@ -12,8 +12,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JSONUtil {
 
@@ -70,7 +70,7 @@ public class JSONUtil {
 	 * @param response
 	 * @throws IOException
 	 */
-	public static void writeJSONGrid(List data, int totalCount, HttpServletResponse response) throws IOException {
+	public static void writeJSONGrid(List<?> data, int totalCount, HttpServletResponse response) throws IOException {
 		JSONUtil.writeJSONGrid(new JSONGrid(totalCount, data.toArray()), response);
 	}
 
@@ -81,8 +81,12 @@ public class JSONUtil {
 	 * @param response
 	 * @throws IOException
 	 */
-	public static void writeJSONTree(List data, HttpServletResponse response) throws IOException {
-		JSONUtil.writeResponse(JSONArray.fromObject(data).toString(), response);
+	public static void writeJSONTree(List<?> data, HttpServletResponse response) throws IOException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		// 配置mapper忽略空属性
+		objectMapper.setSerializationInclusion(Include.NON_EMPTY);
+
+		JSONUtil.writeResponse(objectMapper.writeValueAsString(data), response);
 	}
 
 	/**
@@ -92,7 +96,10 @@ public class JSONUtil {
 	 * @throws IOException
 	 */
 	private static void writeJSONGrid(JSONGrid grid, HttpServletResponse response) throws IOException {
-		JSONUtil.writeResponse(JSONObject.fromObject(grid).toString(), response);
+		ObjectMapper objectMapper = new ObjectMapper();
+		// 配置mapper忽略空属性
+		objectMapper.setSerializationInclusion(Include.NON_EMPTY);
+		JSONUtil.writeResponse(objectMapper.writeValueAsString(grid), response);
 	}
 
 	/**
@@ -131,6 +138,9 @@ public class JSONUtil {
 	 * @throws IOException
 	 */
 	public static void writeObject2JSONString(Object data, HttpServletResponse response) throws IOException {
-		JSONUtil.writeResponse(JSONObject.fromObject(data).toString(), response);
+		ObjectMapper objectMapper = new ObjectMapper();
+		// 配置mapper忽略空属性
+		objectMapper.setSerializationInclusion(Include.NON_EMPTY);
+		JSONUtil.writeResponse(objectMapper.writeValueAsString(data), response);
 	}
 }
