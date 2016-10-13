@@ -17,6 +17,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JSONUtil {
 
+	private static ObjectMapper objectMapper = new ObjectMapper();
+
+	/**
+	 * 对象输出json
+	 * 
+	 * @param object
+	 * @return
+	 */
+	public static String toJsonString(Object object) {
+		try {
+			return objectMapper.writeValueAsString(object);
+		} catch (IOException e) {
+			System.out.println("write to json string error:" + object);
+			return null;
+		}
+	}
+
 	/**
 	 * 输出成功信息
 	 * 
