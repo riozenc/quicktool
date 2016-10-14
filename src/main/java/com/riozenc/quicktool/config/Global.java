@@ -3,12 +3,8 @@
  */
 package com.riozenc.quicktool.config;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.springframework.core.io.DefaultResourceLoader;
 
 import com.riozenc.quicktool.common.util.StringUtil;
 
@@ -120,60 +116,6 @@ public class Global {
 			// 异常代表无配置，这里什么也不做
 		}
 		return null;
-	}
-
-//	/**
-//	 * 获取上传文件的根目录
-//	 * 
-//	 * @return
-//	 */
-//	public static String getUserfilesBaseDir() {
-//		String dir = getConfig("userfiles.basedir");
-//		if (StringUtil.isBlank(dir)) {
-//			try {
-//				dir = ServletContextFactory.getServletContext().getRealPath("/");
-//			} catch (Exception e) {
-//				return "";
-//			}
-//		}
-//		if (!dir.endsWith("/")) {
-//			dir += "/";
-//		}
-//		// System.out.println("userfiles.basedir: " + dir);
-//		return dir;
-//	}
-
-	/**
-	 * 获取工程路径
-	 * 
-	 * @return
-	 */
-	public static String getProjectPath() {
-		// 如果配置了工程路径，则直接返回，否则自动获取。
-		String projectPath = Global.getConfig("projectPath");
-		if (StringUtil.isNotBlank(projectPath)) {
-			return projectPath;
-		}
-		try {
-			File file = new DefaultResourceLoader().getResource("").getFile();
-			if (file != null) {
-				while (true) {
-					File f = new File(file.getPath() + File.separator + "src" + File.separator + "main");
-					if (f == null || f.exists()) {
-						break;
-					}
-					if (file.getParentFile() != null) {
-						file = file.getParentFile();
-					} else {
-						break;
-					}
-				}
-				projectPath = file.toString();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return projectPath;
 	}
 
 }

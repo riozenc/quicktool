@@ -12,9 +12,6 @@ import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.riozenc.quicktool.cache.reflect.ClassCache;
-import com.riozenc.quicktool.cache.reflect.entity.ClassEntity;
-
 /**
  *
  * @author Riozenc
@@ -75,7 +72,7 @@ public class ResultSetCaseUtil {
 
 		int i = 0;
 
-		ClassEntity classEntity = ClassCache.getClassEntity(clazz);
+		// ClassEntity classEntity = ClassCache.getClassEntity(clazz);
 
 		try {
 			ResultSetMetaData metaData = resultSet.getMetaData();
@@ -92,14 +89,15 @@ public class ResultSetCaseUtil {
 				for (; i < numberOfColumns; i++) {
 					temp = lowerCase(metaData.getColumnLabel(i + 1));
 					//
-					field = classEntity.getFieldMap().get(temp);
+					// field = classEntity.getFieldMap().get(temp);
+					field = clazz.getField(temp);
 					if (null == field) {
 						continue;
 					}
 					result = ReflectUtil.typeFormat(field.getType(), resultSet.getObject(i + 1));
 
-					method = classEntity.getMethodMap()
-							.get(MethodGen.generateMethodName(MethodGen.METHOD_TYPE.set, temp));
+					method = clazz.getMethod(MethodGen.generateMethodName(MethodGen.METHOD_TYPE.set, temp),
+							field.getType());
 
 					method.invoke(obj, new Object[] { result });
 
