@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 import com.riozenc.quicktool.annotation.DateAnnotation;
 import com.riozenc.quicktool.cache.reflect.ClassCache;
 import com.riozenc.quicktool.cache.reflect.entity.ClassEntity;
-import com.riozenc.quicktool.common.util.StringUtil;
+import com.riozenc.quicktool.common.util.StringUtils;
 import com.riozenc.quicktool.common.util.annotation.FieldAnnotationUtil;
 import com.riozenc.quicktool.common.util.date.DateUtil;
 import com.riozenc.quicktool.common.util.reflect.MethodGen;
@@ -74,7 +74,7 @@ public class SqlUtil {
 				if (value == null) {
 					continue;
 				}
-				columns.append(StringUtil.allToUpper(field.getName()));
+				columns.append(StringUtils.allToUpper(field.getName()));
 
 				values.append(genSqlValue(field, value));
 
@@ -135,7 +135,7 @@ public class SqlUtil {
 				if (value == null) {
 					continue;
 				}
-				sb.append(StringUtil.allToUpper(field.getName()));
+				sb.append(StringUtils.allToUpper(field.getName()));
 				sb.append("=");
 
 				sb.append(genSqlValue(field, value));
@@ -187,14 +187,14 @@ public class SqlUtil {
 					// select to_char(SAVEDATETIME,'yyyymmdd') SAVEDATETIME from
 					// G_SUBS where subs_id = 159;
 					sb.append("TO_CHAR(")
-							.append(StringUtil.allToUpper(fieldName))
+							.append(StringUtils.allToUpper(fieldName))
 							.append(",'").append(DateUtil.getFormat(field))
 							.append("') as ")
-							.append(StringUtil.allToUpper(fieldName))
+							.append(StringUtils.allToUpper(fieldName))
 							.append(",");
 					// sb.append(StringUtil.allToUpper(fieldName)).append(",");
 				} else {
-					sb.append(StringUtil.allToUpper(fieldName)).append(",");
+					sb.append(StringUtils.allToUpper(fieldName)).append(",");
 				}
 
 				method = classEntity.getMethodMap().get(
@@ -208,7 +208,7 @@ public class SqlUtil {
 
 					continue;
 				}
-				values.append(StringUtil.allToUpper(fieldName)).append("=")
+				values.append(StringUtils.allToUpper(fieldName)).append("=")
 						.append(result);
 
 				values.append(AND);
@@ -274,7 +274,7 @@ public class SqlUtil {
 		result.append("(");
 		int fieldSize = fields.length;
 		for (int i = 0; i < fieldSize; i++) {
-			result.append(StringUtil.allToUpper((fields[i].getName())));
+			result.append(StringUtils.allToUpper((fields[i].getName())));
 			if (i != fieldSize - 1) {
 				result.append(",");
 			}

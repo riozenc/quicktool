@@ -3,7 +3,7 @@
  */
 package com.riozenc.quicktool.mybatis.persistence.dialect.db;
 
-import com.riozenc.quicktool.common.util.StringUtil;
+import com.riozenc.quicktool.common.util.StringUtils;
 import com.riozenc.quicktool.mybatis.persistence.dialect.Dialect;
 
 /**
@@ -64,7 +64,7 @@ public class SQLServer2005Dialect implements Dialect {
 		pagingBuilder.append(sqlPartString);
 
 		// if no ORDER BY is specified use fake ORDER BY field to avoid errors
-		if (StringUtil.isEmpty(orderby)) {
+		if (StringUtils.isEmpty(orderby)) {
 			orderby = "ORDER BY CURRENT_TIMESTAMP";
 		}
 

@@ -3,6 +3,14 @@
  */
 package com.riozenc.quicktool.mybatis.persistence.interceptor;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.executor.ExecutorException;
 import org.apache.ibatis.logging.Log;
@@ -18,19 +26,10 @@ import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.apache.logging.log4j.Logger;
 
-import com.riozenc.quicktool.common.util.StringUtil;
 import com.riozenc.quicktool.common.util.reflect.ReflectUtil;
 import com.riozenc.quicktool.config.Global;
 import com.riozenc.quicktool.mybatis.page.Page;
 import com.riozenc.quicktool.mybatis.persistence.dialect.Dialect;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * SQL工具类
@@ -53,8 +52,7 @@ public class SQLHelper {
 		try {
 
 			if (log.isDebugEnabled()) {
-				log.debug("COUNT SQL: "
-						+ StringUtil.replaceEach(sql, new String[] { "\n", "\t" }, new String[] { " ", " " }));
+				log.debug("COUNT SQL: " + sql);
 			}
 			conn = mappedStatement.getConfiguration().getEnvironment().getDataSource().getConnection();
 			ps = conn.prepareStatement(sql);
@@ -168,8 +166,7 @@ public class SQLHelper {
 		ResultSet rs = null;
 		try {
 			if (log.isDebugEnabled()) {
-				log.debug("COUNT SQL: "
-						+ StringUtil.replaceEach(countSql, new String[] { "\n", "\t" }, new String[] { " ", " " }));
+				log.debug("COUNT SQL: " + countSql);
 			}
 			if (conn == null) {
 				conn = mappedStatement.getConfiguration().getEnvironment().getDataSource().getConnection();
@@ -228,6 +225,7 @@ public class SQLHelper {
 	 * @param hql
 	 * @return
 	 */
+
 	@SuppressWarnings("unused")
 	private static String removeSelect(String qlString) {
 		int beginPos = qlString.toLowerCase().indexOf("from");
@@ -240,7 +238,7 @@ public class SQLHelper {
 	 * @param hql
 	 * @return
 	 */
-	@SuppressWarnings("unused")
+
 	private static String removeOrders(String qlString) {
 		Pattern p = Pattern.compile("order\\s*by[\\w|\\W|\\s|\\S]*", Pattern.CASE_INSENSITIVE);
 		Matcher m = p.matcher(qlString);

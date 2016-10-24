@@ -47,7 +47,7 @@ public class ClassDAOXmlUtil {
 
 		for (Field field : fields) {
 			sb.append("<if test=\"" + field.getName() + " !=null\">").append("\n");
-			sb.append(StringUtil.allToUpper(field.getName()) + " = #{" + field.getName() + "},").append("\n");
+			sb.append(StringUtils.allToUpper(field.getName()) + " = #{" + field.getName() + "},").append("\n");
 			sb.append("</if>").append("\n");
 		}
 		return sb.toString();
@@ -72,7 +72,7 @@ public class ClassDAOXmlUtil {
 
 		for (Field field : fields) {
 
-			sb.append(StringUtil.allToUpper(field.getName())).append(",");
+			sb.append(StringUtils.allToUpper(field.getName())).append(",");
 		}
 		sb.setLength(sb.length() - 1);
 		return sb.toString();
@@ -94,7 +94,7 @@ public class ClassDAOXmlUtil {
 	}
 
 	private static String dynamicSqlFormat(String fieldName) {
-		return "<if test=\"" + fieldName + " !=null\"> \n" + StringUtil.allToUpper(fieldName) + " = #{" + fieldName
+		return "<if test=\"" + fieldName + " !=null\"> \n" + StringUtils.allToUpper(fieldName) + " = #{" + fieldName
 				+ "},\n" + "</if>";
 	}
 

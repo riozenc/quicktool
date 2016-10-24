@@ -6,7 +6,7 @@ package com.riozenc.quicktool.config;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.riozenc.quicktool.common.util.StringUtil;
+import com.riozenc.quicktool.common.util.StringUtils;
 
 /**
  * 全局配置类
@@ -70,7 +70,7 @@ public class Global {
 		String value = map.get(key);
 		if (value == null) {
 			value = loader.getProperty(key);
-			map.put(key, value != null ? value : StringUtil.EMPTY);
+			map.put(key, value != null ? value : StringUtils.EMPTY);
 		}
 		return value;
 	}

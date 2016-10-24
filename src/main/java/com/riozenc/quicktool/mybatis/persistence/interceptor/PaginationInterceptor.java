@@ -15,7 +15,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
-import com.riozenc.quicktool.common.util.StringUtil;
+import com.riozenc.quicktool.common.util.StringUtils;
 import com.riozenc.quicktool.common.util.reflect.ReflectUtil;
 import com.riozenc.quicktool.mybatis.page.Page;
 
@@ -56,7 +56,7 @@ public class PaginationInterceptor extends BaseInterceptor {
 		// 如果设置了分页对象，则进行分页
 		if (page != null && page.getPageSize() != -1) {
 
-			if (StringUtil.isBlank(boundSql.getSql())) {
+			if (StringUtils.isBlank(boundSql.getSql())) {
 				return null;
 			}
 			String originalSql = boundSql.getSql().trim();
