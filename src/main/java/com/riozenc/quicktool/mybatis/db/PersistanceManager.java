@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.ibatis.session.SqlSession;
 
 import com.riozenc.quicktool.common.util.reflect.ObjectToStringUtil;
+import com.riozenc.quicktool.mybatis.dao.BaseDAO;
 
 public class PersistanceManager {
 
@@ -29,10 +30,6 @@ public class PersistanceManager {
 		this.session = session;
 	}
 
-	public List getBadList() {
-		return badList;
-	}
-
 	public PersistanceManager(SqlSession session) {
 		this.session = session;
 		// 自动提交
@@ -41,6 +38,10 @@ public class PersistanceManager {
 
 	public PersistanceManager() {
 
+	}
+
+	public List getBadList() {
+		return badList;
 	}
 
 	/**
@@ -75,6 +76,10 @@ public class PersistanceManager {
 	 */
 	public int insert(String namespace, Object obj) {
 		return session.insert(namespace, obj);
+	}
+
+	public int insert(Class<? extends BaseDAO> clazz, Object obj) {
+		return session.getMapper(clazz).insert(obj);
 	}
 
 	/**
