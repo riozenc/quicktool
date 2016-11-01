@@ -5,7 +5,7 @@
  *	@date 2013-11-13 下午4:06:04
  *	
  */
-package com.riozenc.quicktool.mybatis;
+package com.riozenc.quicktool.mybatis.db;
 
 import java.util.ArrayList;
 import java.util.List;

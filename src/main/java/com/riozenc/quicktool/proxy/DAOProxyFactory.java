@@ -14,7 +14,7 @@ import com.riozenc.quicktool.common.util.log.ExceptionLogUtil;
 import com.riozenc.quicktool.common.util.log.LogUtil;
 import com.riozenc.quicktool.common.util.log.LogUtil.LOG_TYPE;
 import com.riozenc.quicktool.common.util.reflect.ObjectToStringUtil;
-import com.riozenc.quicktool.mybatis.PersistanceManager;
+import com.riozenc.quicktool.mybatis.db.PersistanceManager;
 
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
