@@ -15,7 +15,6 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.mybatis.spring.SqlSessionFactoryBean;
 
 import com.riozenc.quicktool.common.util.log.ExceptionLogUtil;
 import com.riozenc.quicktool.common.util.log.LogUtil;
@@ -32,7 +31,7 @@ public class DbFactory {
 
 	private static boolean FLAG = false;
 
-	private static Map<String, SqlSessionFactoryBean> DBS = new HashMap<String, SqlSessionFactoryBean>();
+	private static Map<String, SqlSessionFactory> DBS = new HashMap<String, SqlSessionFactory>();
 
 	protected static SqlSessionFactory getSqlSessionFactory() {
 		if (FLAG) {
@@ -44,7 +43,7 @@ public class DbFactory {
 
 	protected static SqlSessionFactory getSqlSessionFactory(String name) throws Exception {
 		if (FLAG) {
-			return DBS.get(name).getObject();
+			return DBS.get(name);
 		} else {
 			throw new DbInitException("数据库未完成初始化...");
 		}
@@ -60,11 +59,12 @@ public class DbFactory {
 	}
 
 	public static void initDBs(String name) throws Exception {
+
 		String db = Global.getConfig(name);
 		String[] dbs = db.split(",");
 		for (String temp : dbs) {
 			DBS.put(temp, SpringContextHolder.getBean(temp));
-			FLAG = checkSqlSession(DBS.get(temp).getObject().openSession());
+			FLAG = checkSqlSession(DBS.get(temp).openSession());
 		}
 	}
 

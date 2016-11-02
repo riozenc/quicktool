@@ -7,25 +7,42 @@
  */
 package com.riozenc.quicktool.springmvc.context;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
 
+import com.riozenc.quicktool.springmvc.context.listener.SpringContextListener;
+
+@Service
+@Lazy(false)
 public class SpringContextHolder implements ApplicationContextAware, DisposableBean {
 
 	private static ApplicationContext applicationContext = null;
+
+	private static List<SpringContextListener> list = new ArrayList<>();
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		// TODO Auto-generated method stub
+		if (SpringContextHolder.applicationContext == null) {
+			SpringContextHolder.applicationContext = applicationContext;
+			System.out.println("完成applicationContext赋值");
+		}
+		for (SpringContextListener listener : list) {
+			listener.run();
+		}
+	}
 
 	@Override
 	public void destroy() throws Exception {
 		// TODO Auto-generated method stub
 		applicationContext = null;
-	}
-
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		// TODO Auto-generated method stub
-		SpringContextHolder.applicationContext = applicationContext;
 	}
 
 	/**
@@ -51,4 +68,7 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
 		}
 	}
 
+	public static void addListener(SpringContextListener springContextListener) {
+		list.add(springContextListener);
+	}
 }
