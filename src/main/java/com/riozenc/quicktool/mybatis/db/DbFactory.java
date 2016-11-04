@@ -10,20 +10,28 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.reflection.ReflectionException;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import com.riozenc.quicktool.common.util.log.ExceptionLogUtil;
 import com.riozenc.quicktool.common.util.log.LogUtil;
 import com.riozenc.quicktool.common.util.log.LogUtil.LOG_TYPE;
+import com.riozenc.quicktool.common.util.reflect.ReflectUtil;
 import com.riozenc.quicktool.config.Global;
 import com.riozenc.quicktool.exception.DbInitException;
+import com.riozenc.quicktool.mybatis.MybatisEntity;
 import com.riozenc.quicktool.springmvc.context.SpringContextHolder;
 
 public class DbFactory {
+	private static final String DB = "db";
 
 	private static final String resource = "mybatis-config.xml";
 	private static SqlSessionFactory sqlSessionFactory;
@@ -68,6 +76,39 @@ public class DbFactory {
 		}
 	}
 
+	public static void init() {
+		String db = Global.getConfig(DB);
+		String[] dbs = db.split(",");
+		for (String temp : dbs) {
+			SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
+			PooledDataSource pooledDataSource = new PooledDataSource();
+
+			for (Entry<String, String> entry : Global.getConfigs(temp).entrySet()) {
+				try {
+					ReflectUtil.setFieldValue(pooledDataSource, getParam(entry.getKey()), entry.getValue());
+				} catch (Exception e) {
+					e.initCause(new ReflectionException(getParam(entry.getKey()) + "不是正确的属性..."));
+					System.out.println(getParam(entry.getKey()) + "不是正确的属性...");
+				}
+			}
+
+			factoryBean.setDataSource(pooledDataSource);
+			factoryBean.setTypeAliasesPackage("crm");
+			factoryBean.setTypeAliasesSuperType(MybatisEntity.class);
+
+			try {
+				factoryBean.setMapperLocations(
+						new PathMatchingResourcePatternResolver().getResources("classpath:/crm/webapp/**/*.xml"));
+				factoryBean.setConfigLocation(
+						new PathMatchingResourcePatternResolver().getResource("classpath:mybatis-config.xml"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+	}
+
 	public static void initDB() {
 		try {
 			reader = Resources.getResourceAsReader(resource);
@@ -102,4 +143,15 @@ public class DbFactory {
 			sqlSession.close();
 		}
 	}
+
+	/**
+	 * eg: xxx.aaa ——> aaa eg: xxx.aaa.bbb.ccc ——> ccc
+	 * 
+	 * @param param
+	 * @return
+	 */
+	private static String getParam(String param) {
+		return param.substring(param.lastIndexOf(".") + 1);
+	}
+
 }

@@ -76,6 +76,22 @@ public class Global {
 	}
 
 	/**
+	 * 获取配置
+	 * 
+	 * @see ${fns:getConfig('adminPath')}
+	 */
+	public static Map<String, String> getConfigs(String key) {
+		Map<String, String> map = new HashMap<String, String>();
+
+		for (String temp : loader.getProperties().stringPropertyNames()) {
+			if (temp.indexOf(key) > -1) {
+				map.put(temp, getConfig(temp));
+			}
+		}
+		return map;
+	}
+
+	/**
 	 * 获取管理端根路径
 	 */
 	public static String getAdminPath() {

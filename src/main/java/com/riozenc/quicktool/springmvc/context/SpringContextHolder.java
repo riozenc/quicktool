@@ -14,13 +14,9 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
 
 import com.riozenc.quicktool.springmvc.context.listener.SpringContextListener;
 
-@Service
-@Lazy(false)
 public class SpringContextHolder implements ApplicationContextAware, DisposableBean {
 
 	private static ApplicationContext applicationContext = null;
