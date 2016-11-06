@@ -19,13 +19,6 @@ import com.riozenc.quicktool.common.util.file.FileUtil;
 
 public class ClassDAOXmlUtil {
 
-	public static void main(String[] args) {
-		buildXML("D:\\EclipseWorkspaces\\interactionGis\\src\\main\\java\\com\\wisdom\\gy\\interactionGis\\app\\dao\\gis\\log", 
-				"com.wisdom.gy.interactionGis.app.domain.gis.log");
-		buildXML("D:\\EclipseWorkspaces\\interactionGis\\src\\main\\java\\com\\wisdom\\gy\\interactionGis\\app\\dao\\gis\\data", 
-				"com.wisdom.gy.interactionGis.app.domain.gis.data");
-	}
-	
 	public static String getInsert(Class<?> clazz) {
 		StringBuffer sb = new StringBuffer();
 
@@ -63,7 +56,6 @@ public class ClassDAOXmlUtil {
 			System.out.println("</if>");
 
 		}
-
 	}
 
 	public static String getColumns(Class<?> clazz) {
@@ -93,9 +85,9 @@ public class ClassDAOXmlUtil {
 		return list;
 	}
 
-	private static String dynamicSqlFormat(String fieldName) {
-		return "<if test=\"" + fieldName + " !=null\"> \n" + StringUtils.allToUpper(fieldName) + " = #{" + fieldName
-				+ "},\n" + "</if>";
+	private static String dynamicSqlFormat(String fieldName, boolean isAnd) {
+		return "<if test=\"" + fieldName + " !=null\"> \n" + (isAnd ? " and " : "") + StringUtils.allToUpper(fieldName)
+				+ " = #{" + fieldName + "}" + (isAnd ? "" : ",") + "\n" + "</if>";
 	}
 
 	/**
@@ -117,53 +109,65 @@ public class ClassDAOXmlUtil {
 		}
 	}
 
-	// 生成XML文件
 	public static void buildXML(String docPath, Class<?> clazz) throws IOException {
-		
-		if(!clazz.getSimpleName().contains("Domain")&&!clazz.getSimpleName().contains("DAO")){
-			return;
-		}
-		
-		String fileName = clazz.getSimpleName().replace("Domain", "DAO");// xxxDAO
 		String tableName = "I_GIS_" + clazz.getSimpleName().replace("Domain", "").toUpperCase();
-		File file = FileUtil.createFile(docPath, fileName + ".xml");
+		buildXML(docPath, clazz, tableName);
+	}
 
-		BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
-		// xml头部
-
-		StringBuffer sb = new StringBuffer();
-		sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
-		sb.append("\n");
-		sb.append(
-				"<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">");
-		sb.append("\n");
-		sb.append("<mapper namespace=\"" + clazz.getName() + "\">");
-		sb.append("\n");
-
-		bufferedWriter.write(sb.toString());
-
-		bufferedWriter.write(buildFindByKey(clazz, tableName));
-		bufferedWriter.write(buildFindByWhere(clazz, tableName));
-		bufferedWriter.write(buildInsert(clazz, tableName));
+	// 生成XML文件
+	public static void buildXML(String docPath, Class<?> clazz, String tableName) throws IOException {
+		BufferedWriter bufferedWriter = null;
 		try {
-			bufferedWriter.write(buildUpdate(clazz, tableName));
-			bufferedWriter.write(buildDelete(clazz, tableName));
+			if (!clazz.getSimpleName().contains("Domain") && !clazz.getSimpleName().contains("DAO")) {
+				return;
+			}
+			String namespace = clazz.getName().replace("domain", "dao").replace("Domain", "DAO");
+
+			String fileName = clazz.getSimpleName().replace("Domain", "DAO");// xxxDAO
+
+			// xml头部
+
+			StringBuffer sb = new StringBuffer();
+			sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
+			sb.append("\n");
+			sb.append(
+					"<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">");
+			sb.append("\n");
+			sb.append("<mapper namespace=\"" + namespace + "\">");
+			sb.append("\n");
+
+			sb.append(buildFindByKey(clazz, tableName));
+
+			sb.append(buildFindByWhere(clazz, tableName));
+
+			sb.append(buildInsert(clazz, tableName));
+			sb.append(buildUpdate(clazz, tableName));
+			sb.append(buildDelete(clazz, tableName));
+
+			sb.append("</mapper>");
+
+			File file = FileUtil.createFile(docPath, fileName + ".xml");
+
+			bufferedWriter = new BufferedWriter(new FileWriter(file));
+
+			bufferedWriter.write(sb.toString());
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			if (null != bufferedWriter) {
+				bufferedWriter.flush();
+				bufferedWriter.close();
+			}
 		}
-
-		bufferedWriter.write("</mapper>");
-
-		bufferedWriter.flush();
-		bufferedWriter.close();
 	}
 
 	// findByKey
 	private static String buildFindByKey(Class<?> clazz, String tableName) throws IOException {
 		StringBuffer sb = new StringBuffer();
-		sb.append("<select id=\"findByWhere\" parameterType=\"").append(clazz.getSimpleName())
-				.append("\" resultType=\"").append(clazz.getSimpleName()).append("\" useCache=\"true\">");
+		sb.append("<select id=\"findByKey\" parameterType=\"").append(clazz.getSimpleName()).append("\" resultType=\"")
+				.append(clazz.getSimpleName()).append("\" useCache=\"true\">");
 		sb.append("\n");
 		sb.append("select ").append(getColumns(clazz)).append(" from ").append(tableName);
 		List<String> primaryKeys = getPrimaryKeys(clazz);
@@ -171,7 +175,7 @@ public class ClassDAOXmlUtil {
 			sb.append("<where>");
 			sb.append("\n");
 			for (String fieldName : getPrimaryKeys(clazz)) {
-				sb.append(dynamicSqlFormat(fieldName));
+				sb.append(dynamicSqlFormat(fieldName, true));
 				sb.append("\n");
 			}
 			sb.append("</where>");
@@ -194,7 +198,7 @@ public class ClassDAOXmlUtil {
 		sb.append("\n");
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields) {
-			sb.append(dynamicSqlFormat(field.getName()));
+			sb.append(dynamicSqlFormat(field.getName(), true));
 			sb.append("\n");
 		}
 		sb.append("</where>");
@@ -237,7 +241,7 @@ public class ClassDAOXmlUtil {
 			sb.append("<where>");
 			sb.append("\n");
 			for (String fieldName : getPrimaryKeys(clazz)) {
-				sb.append(dynamicSqlFormat(fieldName));
+				sb.append(dynamicSqlFormat(fieldName, true));
 				sb.append("\n");
 			}
 			sb.append("</where>");
@@ -263,7 +267,7 @@ public class ClassDAOXmlUtil {
 			sb.append("<where>");
 			sb.append("\n");
 			for (String fieldName : getPrimaryKeys(clazz)) {
-				sb.append(dynamicSqlFormat(fieldName));
+				sb.append(dynamicSqlFormat(fieldName, true));
 				sb.append("\n");
 			}
 			sb.append("</where>");

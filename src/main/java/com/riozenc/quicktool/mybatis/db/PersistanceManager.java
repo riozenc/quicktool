@@ -13,7 +13,6 @@ import java.util.List;
 import org.apache.ibatis.session.SqlSession;
 
 import com.riozenc.quicktool.common.util.reflect.ObjectToStringUtil;
-import com.riozenc.quicktool.mybatis.dao.BaseDAO;
 
 public class PersistanceManager {
 
@@ -76,10 +75,6 @@ public class PersistanceManager {
 	 */
 	public int insert(String namespace, Object obj) {
 		return session.insert(namespace, obj);
-	}
-
-	public int insert(Class<? extends BaseDAO> clazz, Object obj) {
-		return session.getMapper(clazz).insert(obj);
 	}
 
 	/**

@@ -41,6 +41,17 @@ public class DbFactory {
 
 	private static Map<String, SqlSessionFactory> DBS = new HashMap<String, SqlSessionFactory>();
 
+	private static void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
+		if (DbFactory.sqlSessionFactory == null) {
+			DbFactory.sqlSessionFactory = sqlSessionFactory;
+		}
+	}
+
+	/**
+	 * 获取默认数据库连接工厂,多数据源情况下取第一个
+	 * 
+	 * @return
+	 */
 	protected static SqlSessionFactory getSqlSessionFactory() {
 		if (FLAG) {
 			return sqlSessionFactory;
@@ -49,6 +60,13 @@ public class DbFactory {
 		}
 	}
 
+	/**
+	 * 获取默认数据库连接工厂,根据name
+	 * 
+	 * @param name
+	 * @return
+	 * @throws Exception
+	 */
 	protected static SqlSessionFactory getSqlSessionFactory(String name) throws Exception {
 		if (FLAG) {
 			return DBS.get(name);
@@ -58,7 +76,7 @@ public class DbFactory {
 	}
 
 	/**
-	 * 默认db
+	 * 通过Spring的配置文件初始化
 	 * 
 	 * @throws Exception
 	 */
@@ -66,16 +84,25 @@ public class DbFactory {
 		initBySpring("db");
 	}
 
+	/**
+	 * 通过Spring的配置文件初始化,name为config中的数据库名称
+	 * 
+	 * @param name
+	 * @throws Exception
+	 */
 	public static void initBySpring(String name) throws Exception {
 
 		String db = Global.getConfig(name);
 		String[] dbs = db.split(",");
 		for (String temp : dbs) {
 			DBS.put(temp, SpringContextHolder.getBean(temp));
-			FLAG = checkSqlSession(DBS.get(temp).openSession());
+			FLAG = checkSqlSessionFactory(DBS.get(temp));
 		}
 	}
 
+	/**
+	 * 通过java代码实现初始化,name为config中的数据库名称
+	 */
 	public static void initByFactory() {
 		String db = Global.getConfig(DB);
 		String[] dbs = db.split(",");
@@ -107,7 +134,7 @@ public class DbFactory {
 						new PathMatchingResourcePatternResolver().getResource("classpath:mybatis-config.xml"));
 
 				DBS.put(temp, factoryBean.getObject());
-				FLAG = checkSqlSession(DBS.get(temp).openSession());
+				FLAG = checkSqlSessionFactory(DBS.get(temp));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -120,7 +147,10 @@ public class DbFactory {
 
 	}
 
-	public static void initDB() {
+	/**
+	 * 初始化mybatis配置文件数据源
+	 */
+	public static void initByMybatis() {
 		try {
 			reader = Resources.getResourceAsReader(resource);
 		} catch (IOException e) {
@@ -130,16 +160,23 @@ public class DbFactory {
 		}
 		sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader, "gy_jl");
 
-		FLAG = checkSqlSession(sqlSessionFactory.openSession());
+		FLAG = checkSqlSessionFactory(sqlSessionFactory);
 		if (!FLAG) {
 			LogUtil.getLogger(LOG_TYPE.DB).info("数据库完成初始化...");
 		}
 	}
 
-	private static boolean checkSqlSession(SqlSession sqlSession) {
-
+	/**
+	 * 校验数据库是否可用
+	 * 
+	 * @param sqlSession
+	 * @return
+	 */
+	private static boolean checkSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
+		SqlSession sqlSession = sqlSessionFactory.openSession();
 		try {
 			if (sqlSession.getConnection().isValid(2000)) {
+				setSqlSessionFactory(sqlSessionFactory);
 				return true;
 			} else {
 				LogUtil.getLogger(LOG_TYPE.DB).info("数据库连接校验等待超时...请检查...");

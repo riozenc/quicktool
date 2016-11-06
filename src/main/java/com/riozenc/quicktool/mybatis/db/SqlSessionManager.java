@@ -34,4 +34,19 @@ public class SqlSessionManager {
 		// 不自动提交
 		return sqlSessionFactory.openSession(executorType, false);
 	}
+
+	public static SqlSession getSession(String dbName, ExecutorType executorType) {
+		if (null == sqlSessionFactory) {
+			synchronized (b) {
+				try {
+					sqlSessionFactory = DbFactory.getSqlSessionFactory(dbName);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		// 不自动提交
+		return sqlSessionFactory.openSession(executorType, false);
+	}
 }

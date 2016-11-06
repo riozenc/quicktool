@@ -46,6 +46,17 @@ public class JSONUtil {
 	}
 
 	/**
+	 * 输出成功信息
+	 * 
+	 * @param msg
+	 * @param response
+	 * @throws IOException
+	 */
+	public static String writeSuccessMsg(String msg) {
+		return "{\"success\":true,\"msg\":\"" + msg + "\"}";
+	}
+
+	/**
 	 * 输出成功
 	 * 
 	 * @param response
@@ -73,6 +84,16 @@ public class JSONUtil {
 	 */
 	public static void writeErrorMsg(String msg, HttpServletResponse response) throws IOException {
 		JSONUtil.writeResponse("{\"success\":false,\"msg\":\"" + msg + "\"}", response);
+	}
+
+	/**
+	 * 输出失败信息
+	 * 
+	 * @param response
+	 * @throws IOException
+	 */
+	public static String writeErrorMsg(String msg) throws IOException {
+		return "{\"success\":false,\"msg\":\"" + msg + "\"}";
 	}
 
 	public static void wirteInfo(String msg, HttpServletResponse response) throws IOException {

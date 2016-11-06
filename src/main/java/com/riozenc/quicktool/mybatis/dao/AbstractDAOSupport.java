@@ -18,8 +18,10 @@ public abstract class AbstractDAOSupport {
 	private ExecutorType executorType = ExecutorType.SIMPLE;
 	private boolean flag = true;
 	private SqlSession sqlSession = null;
+	private static String NAMESPACE = null;
 
 	public AbstractDAOSupport() {
+
 	}
 
 	public AbstractDAOSupport(ExecutorType executorType) {
@@ -34,6 +36,12 @@ public abstract class AbstractDAOSupport {
 	protected PersistanceManager getPersistanceManager() {
 
 		return getPersistanceManager(this.executorType, this.flag);
+
+	}
+
+	protected PersistanceManager getPersistanceManager(String dbName) {
+
+		return getPersistanceManager(dbName, this.executorType, this.flag);
 
 	}
 
@@ -59,6 +67,29 @@ public abstract class AbstractDAOSupport {
 		} else {
 			return new PersistanceManager(sqlSession);
 		}
+	}
+
+	protected PersistanceManager getPersistanceManager(String dbName, ExecutorType executorType, boolean flag) {
+
+		System.out.println(Thread.currentThread().getStackTrace()[3].getMethodName());
+
+		Long l = System.currentTimeMillis();
+
+		sqlSession = SqlSessionManager.getSession(dbName, executorType);
+		LogUtil.getLogger(LOG_TYPE.DB).info("获取SqlSession用时:" + (System.currentTimeMillis() - l));
+
+		if (flag) {
+			return (PersistanceManager) DAOProxyFactory.getInstance().createProxy(new PersistanceManager(sqlSession));
+		} else {
+			return new PersistanceManager(sqlSession);
+		}
+	}
+
+	protected String getNamespace() {
+		if (null == NAMESPACE) {
+			NAMESPACE = this.getClass().getName();
+		}
+		return NAMESPACE;
 	}
 
 }
