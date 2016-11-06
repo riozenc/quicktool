@@ -62,11 +62,11 @@ public class DbFactory {
 	 * 
 	 * @throws Exception
 	 */
-	public static void initDBs() throws Exception {
-		initDBs("db");
+	public static void initBySpring() throws Exception {
+		initBySpring("db");
 	}
 
-	public static void initDBs(String name) throws Exception {
+	public static void initBySpring(String name) throws Exception {
 
 		String db = Global.getConfig(name);
 		String[] dbs = db.split(",");
@@ -76,7 +76,7 @@ public class DbFactory {
 		}
 	}
 
-	public static void init() {
+	public static void initByFactory() {
 		String db = Global.getConfig(DB);
 		String[] dbs = db.split(",");
 		for (String temp : dbs) {
@@ -85,7 +85,11 @@ public class DbFactory {
 
 			for (Entry<String, String> entry : Global.getConfigs(temp).entrySet()) {
 				try {
-					ReflectUtil.setFieldValue(pooledDataSource, getParam(entry.getKey()), entry.getValue());
+
+					// ReflectUtil.setFieldValue(pooledDataSource,
+					// getParam(entry.getKey()), entry.getValue());
+					ReflectUtil.setValue(pooledDataSource, getParam(entry.getKey()), entry.getValue());
+
 				} catch (Exception e) {
 					e.initCause(new ReflectionException(getParam(entry.getKey()) + "不是正确的属性..."));
 					System.out.println(getParam(entry.getKey()) + "不是正确的属性...");
@@ -101,10 +105,17 @@ public class DbFactory {
 						new PathMatchingResourcePatternResolver().getResources("classpath:/crm/webapp/**/*.xml"));
 				factoryBean.setConfigLocation(
 						new PathMatchingResourcePatternResolver().getResource("classpath:mybatis-config.xml"));
+
+				DBS.put(temp, factoryBean.getObject());
+				FLAG = checkSqlSession(DBS.get(temp).openSession());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+
 		}
 
 	}

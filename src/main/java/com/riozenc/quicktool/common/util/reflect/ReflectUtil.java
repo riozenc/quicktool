@@ -18,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.riozenc.quicktool.common.util.date.DateUtil;
+import com.riozenc.quicktool.common.util.reflect.MethodGen.METHOD_TYPE;
 
 public class ReflectUtil {
 
@@ -38,6 +39,23 @@ public class ReflectUtil {
 			e.printStackTrace();
 		}
 		return result;
+	}
+
+	/**
+	 * 直接设置对象属性值, 无视private/protected修饰符, 不经过setter函数.
+	 */
+	public static void setFieldValue(final Object obj, final String fieldName, final Object value) {
+		Field field = getAccessibleField(obj, fieldName);
+
+		if (field == null) {
+			throw new IllegalArgumentException("Could not find field [" + fieldName + "] on target [" + obj + "]");
+		}
+
+		try {
+			field.set(obj, value);
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -68,6 +86,39 @@ public class ReflectUtil {
 	}
 
 	/**
+	 * 循环向上转型, 获取对象的DeclaredField, 并强制设置为可访问.
+	 * 
+	 * 如向上转型到Object仍无法找到, 返回null.
+	 */
+	public static Method getAccessibleMethod(final Object obj, final String fieldName,
+			final MethodGen.METHOD_TYPE methodType, final Class<?>... parameterTypes) {
+		if (null == obj) {
+			throw new RuntimeException("object can't be null");
+		}
+		if (null == fieldName || "".equals(fieldName.trim())) {
+			throw new RuntimeException("fieldName can't be blank");
+		}
+
+		if (null == methodType || "".equals(methodType.name().trim())) {
+			throw new RuntimeException("methodType can't be blank");
+		}
+
+		for (Class<?> superClass = obj.getClass(); superClass != Object.class; superClass = superClass
+				.getSuperclass()) {
+			try {
+				Method method = superClass.getDeclaredMethod(MethodGen.generateMethodName(methodType, fieldName),
+						parameterTypes);
+				makeAccessible(method);
+				return method;
+			} catch (NoSuchMethodException e) {// NOSONAR
+				// Method不在当前类定义,继续向上转型
+				continue;// new add
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * 改变private/protected的成员变量为public,尽量不调用实际改动的语句,避免JDK的SecurityManager.
 	 */
 	private static void makeAccessible(Field field) {
@@ -76,22 +127,55 @@ public class ReflectUtil {
 			field.setAccessible(true);
 		}
 	}
-	
+
 	/**
-	 * 直接设置对象属性值, 无视private/protected修饰符, 不经过setter函数.
+	 * 改变private/protected的方法为public,尽量不调用实际改动的语句,避免JDK的SecurityManager.
 	 */
-	public static void setFieldValue(final Object obj, final String fieldName, final Object value) {
-		Field field = getAccessibleField(obj, fieldName);
-
-		if (field == null) {
-			throw new IllegalArgumentException("Could not find field [" + fieldName + "] on target [" + obj + "]");
+	private static void makeAccessible(Method method) {
+		if ((!Modifier.isPublic(method.getModifiers()) || !Modifier.isPublic(method.getDeclaringClass().getModifiers())
+				|| Modifier.isFinal(method.getModifiers())) && !method.isAccessible()) {
+			method.setAccessible(true);
 		}
+	}
 
+	/**
+	 * 通过set方法设置对象属性值, 无视private/protected修饰符, 经过setter函数.
+	 */
+	public static Object setValue(final Object obj, final String fieldName, final Object... values) {
+		Object result = null;
+		Class<?> paramType = null;
+		Method method = null;
+		Field field = getAccessibleField(obj, fieldName);
+		if (field == null) {
+			Class<?>[] os = { null };
+
+			method = getAccessibleMethod(obj, fieldName, METHOD_TYPE.get, os);
+			if (method == null) {
+				method = getAccessibleMethod(obj, fieldName, METHOD_TYPE.get, null);
+			}
+			paramType = method.getReturnType();
+
+		} else {
+			paramType = field.getType();
+		}
+		method = getAccessibleMethod(obj, fieldName, METHOD_TYPE.set, paramType);
 		try {
-			field.set(obj, value);
+
+			result = method.invoke(obj, typeFormat(paramType, values));
 		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return result;
 	}
 
 	/**
@@ -132,7 +216,24 @@ public class ReflectUtil {
 	 * @return
 	 * @throws Exception
 	 */
+	public static Object[] typeFormat(Class<?> clazz, Object... values) throws Exception {
+		Object[] objects = new Object[values.length];
+		for (int i = 0; i < objects.length; i++) {
+			objects[i] = typeFormat(clazz, values[i]);
+		}
+		return objects;
+	}
+
+	/**
+	 * 类型转换
+	 *
+	 * @param clazz
+	 * @param value
+	 * @return
+	 * @throws Exception
+	 */
 	public static Object typeFormat(Class<?> clazz, Object value) throws Exception {
+
 		if (String.class.equals(clazz)) {
 			if (null == value || "".equals(value)) {
 				return null;
@@ -212,4 +313,5 @@ public class ReflectUtil {
 			}
 		}
 	}
+
 }
