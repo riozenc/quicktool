@@ -34,11 +34,14 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
 			listener.run();
 		}
 	}
-
 	@Override
 	public void destroy() throws Exception {
 		// TODO Auto-generated method stub
 		applicationContext = null;
+	}
+	public static ApplicationContext getApplicationContext(){
+		assertContextInjected();
+		return applicationContext;
 	}
 
 	/**
