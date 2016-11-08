@@ -16,7 +16,12 @@ public class ClassFileFilter {
 
 			public boolean accept(File file) {
 
+				if (file.isDirectory()) {
+					return recursive;
+				}
+
 				for (String fileType : fileTypes) {
+
 					return file.getName().endsWith(fileType);
 				}
 
