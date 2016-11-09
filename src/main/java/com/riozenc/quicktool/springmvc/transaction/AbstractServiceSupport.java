@@ -12,10 +12,10 @@ import com.riozenc.quicktool.springmvc.transaction.proxy.TransactionServiceProxy
 public abstract class AbstractServiceSupport {
 
 	public Object getTransactionService() throws InstantiationException, IllegalAccessException {
-		return get(this);
+		return get(this.getClass());
 	}
 
-	private Object get(Object object) throws InstantiationException, IllegalAccessException {
-		return TransactionServiceProxyFactory.getInstance().createProxy(object);
+	private Object get(Class<?> clazz) throws InstantiationException, IllegalAccessException {
+		return TransactionServiceProxyFactory.getInstance().createProxy(clazz);
 	}
 }

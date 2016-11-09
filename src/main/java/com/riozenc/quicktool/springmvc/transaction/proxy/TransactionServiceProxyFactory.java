@@ -36,13 +36,13 @@ public class TransactionServiceProxyFactory implements MethodInterceptor {
 		return new TransactionServiceProxyFactory();
 	}
 
-	public Object createProxy(Object object) throws InstantiationException, IllegalAccessException {
-		targetObject = object;
+	@SuppressWarnings("unchecked")
+	public <T> T createProxy(Class<T> clazz) throws InstantiationException, IllegalAccessException {
+		targetObject = clazz.newInstance();
 		Enhancer enhancer = new Enhancer();
 		enhancer.setSuperclass(PersistanceManager.class);
 		enhancer.setCallback(this);
-
-		return enhancer.create();
+		return (T) enhancer.create();
 	}
 
 	@Override

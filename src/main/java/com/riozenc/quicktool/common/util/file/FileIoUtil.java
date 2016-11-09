@@ -22,9 +22,16 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.springframework.core.io.support.ResourcePatternResolver;
+
+import com.riozenc.quicktool.common.util.ClassUtils;
 import com.riozenc.quicktool.common.util.file.filter.ClassFileFilter;
 
 public class FileIoUtil {
+
+	private static final String CLASSPATH_ALL_URL_PREFIX = "classpath*:";
+	private static final String DEFAULT_RESOURCE_PATTERN = "**/*.class";
+
 	// 是否循环搜索子包
 	private static boolean recursive = true;
 
@@ -54,7 +61,10 @@ public class FileIoUtil {
 		Enumeration<URL> dirs;
 
 		try {
-			dirs = Thread.currentThread().getContextClassLoader().getResources(packageDirName);
+
+//			String packageSearchPath = CLASSPATH_ALL_URL_PREFIX + packageDirName + "/" + DEFAULT_RESOURCE_PATTERN;
+			dirs = ClassUtils.getDefaultClassLoader().getResources(packageDirName);
+//			dirs = Thread.currentThread().getContextClassLoader().getResources(packageDirName);
 			while (dirs.hasMoreElements()) {
 				URL url = dirs.nextElement();
 				String protocol = url.getProtocol();
