@@ -85,7 +85,7 @@ public class TransactionServiceProxyFactory implements MethodInterceptor {
 
 	private void targetObjectInjected() {
 		if (targetObject == null) {
-			targetObject = SpringContextHolder.getBean(StringUtils.decapitalize(this.clazz.getSimpleName()));
+			targetObject = SpringContextHolder.getBean("aaa_"+StringUtils.decapitalize(this.clazz.getSimpleName()));
 		}
 	}
 

@@ -11,8 +11,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
@@ -52,7 +54,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
 		} else {
 			processBeanDefinitions(beanDefinitions);
 		}
-
+		addFactoryBeanBeanDefinitionHolder(beanDefinitions);
 		return beanDefinitions;
 	}
 
@@ -107,8 +109,8 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
 	private void processBeanDefinitions(Set<BeanDefinitionHolder> beanDefinitions) {
 		GenericBeanDefinition beanDefinition;
 		for (BeanDefinitionHolder holder : beanDefinitions) {
-//			getFactoryBeanDefinition(holder);
-			
+			getFactoryBeanDefinition(holder);
+
 			beanDefinition = (GenericBeanDefinition) holder.getBeanDefinition();
 			if (logger.isDebugEnabled()) {
 				logger.debug("Creating MapperFactoryBean with name '" + holder.getBeanName() + "' and '"
@@ -120,7 +122,8 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
 			beanDefinition.getConstructorArgumentValues().addGenericArgumentValue(beanDefinition.getBeanClassName()); // issue
 			// #59
 			try {
-				beanDefinition.getPropertyValues().add("serviceInterface",Class.forName(beanDefinition.getBeanClassName()));
+				beanDefinition.getPropertyValues().add("serviceInterface",
+						Class.forName(beanDefinition.getBeanClassName()));
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				logger.debug(beanDefinition.getBeanClassName() + "is Not Found");
@@ -134,29 +137,34 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
 					logger.debug("Enabling autowire by type for MapperFactoryBean with name '" + holder.getBeanName()
 							+ "'.");
 				}
-				beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
+				// beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
+				beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_NAME);
 			}
-			
-			
-			
+
 		}
 	}
 
 	private void getFactoryBeanDefinition(BeanDefinitionHolder holder) {
 
-		BeanDefinitionHolder factoryBeanholder = new BeanDefinitionHolder(holder.getBeanDefinition(),"aaa_"+holder.getBeanName());
-		
-		GenericBeanDefinition beanDefinition = (GenericBeanDefinition)factoryBeanholder.getBeanDefinition();
-		
-		
+		GenericBeanDefinition beanDefinition = (GenericBeanDefinition) holder.getBeanDefinition();
 
-		
+		BeanDefinitionHolder factoryBeanholder = new BeanDefinitionHolder((BeanDefinition) beanDefinition.clone(),
+				"aaa_" + holder.getBeanName());
+
+		// GenericBeanDefinition beanDefinition = (GenericBeanDefinition)
+		// factoryBeanholder.getBeanDefinition();
+
+		// getRegistry().registerBeanDefinition("aaa_" + holder.getBeanName(),
+		// beanDefinition);
+
 		factoryBeanBeanDefinitionSet.add(factoryBeanholder);
 	}
 
 	private void addFactoryBeanBeanDefinitionHolder(Set<BeanDefinitionHolder> beanDefinitions) {
+
 		for (BeanDefinitionHolder factoryBeanholder : factoryBeanBeanDefinitionSet) {
-			beanDefinitions.add(factoryBeanholder);
+			BeanDefinitionReaderUtils.registerBeanDefinition(factoryBeanholder, getRegistry());
+			// beanDefinitions.add(factoryBeanholder);
 		}
 	}
 }
