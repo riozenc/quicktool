@@ -12,11 +12,14 @@ import com.riozenc.quicktool.springmvc.transaction.proxy.TransactionServiceProxy
 public class TransactionServiceFactoryBean<T> implements FactoryBean<T> {
 
 	private Class<T> serviceInterface;
-	
-	
+
 	public TransactionServiceFactoryBean() {
-	    //intentionally empty 
-	  }
+		// intentionally empty
+	}
+
+	public TransactionServiceFactoryBean(Class<T> serviceInterface) {
+		this.serviceInterface = serviceInterface;
+	}
 
 	public void setServiceInterface(Class<T> serviceInterface) {
 		this.serviceInterface = serviceInterface;
@@ -40,10 +43,10 @@ public class TransactionServiceFactoryBean<T> implements FactoryBean<T> {
 	@Override
 	public boolean isSingleton() {
 		// TODO Auto-generated method stub
-		return true;
+		return false;
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		this.serviceInterface = null;
+		throw new Exception("没有可实例化的目标...");
 	}
 }

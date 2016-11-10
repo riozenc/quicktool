@@ -17,7 +17,7 @@ import com.riozenc.quicktool.annotation.TransactionService;
 import com.riozenc.quicktool.common.util.StringUtils;
 import com.riozenc.quicktool.config.Global;
 
-public class TransactionManager implements BeanDefinitionRegistryPostProcessor {
+public class TransactionServiceRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor {
 
 	private String namespace = "namespace";
 

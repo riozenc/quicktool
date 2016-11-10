@@ -8,6 +8,7 @@ package com.riozenc.quicktool.springmvc.transaction;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -26,6 +27,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
 	private Class<? extends Annotation> annotationClass;
 	private Class<?> transactionServiceInterface;
 	private TransactionServiceFactoryBean<?> transactionServiceFactoryBean = new TransactionServiceFactoryBean<Object>();
+	private Set<BeanDefinitionHolder> factoryBeanBeanDefinitionSet = new HashSet<BeanDefinitionHolder>();
 
 	public ClassPathMapperScanner(BeanDefinitionRegistry registry) {
 		super(registry, false);
@@ -103,29 +105,27 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
 	}
 
 	private void processBeanDefinitions(Set<BeanDefinitionHolder> beanDefinitions) {
-		GenericBeanDefinition definition;
+		GenericBeanDefinition beanDefinition;
 		for (BeanDefinitionHolder holder : beanDefinitions) {
-			definition = (GenericBeanDefinition) holder.getBeanDefinition();
-
-			Object o1 = holder.getSource();
-
+//			getFactoryBeanDefinition(holder);
+			
+			beanDefinition = (GenericBeanDefinition) holder.getBeanDefinition();
 			if (logger.isDebugEnabled()) {
 				logger.debug("Creating MapperFactoryBean with name '" + holder.getBeanName() + "' and '"
-						+ definition.getBeanClassName() + "' mapperInterface");
+						+ beanDefinition.getBeanClassName() + "' mapperInterface");
 			}
 
 			// the mapper interface is the original class of the bean
 			// but, the actual class of the bean is MapperFactoryBean
-			definition.getConstructorArgumentValues().addGenericArgumentValue(definition.getBeanClassName()); // issue
-																												// #59
-
+			beanDefinition.getConstructorArgumentValues().addGenericArgumentValue(beanDefinition.getBeanClassName()); // issue
+			// #59
 			try {
-				definition.getPropertyValues().add("serviceInterface", Class.forName(definition.getBeanClassName()));
+				beanDefinition.getPropertyValues().add("serviceInterface",Class.forName(beanDefinition.getBeanClassName()));
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
-				logger.debug(definition.getBeanClassName() + "is Not Found");
+				logger.debug(beanDefinition.getBeanClassName() + "is Not Found");
 			}
-			definition.setBeanClass(this.transactionServiceFactoryBean.getClass());
+			beanDefinition.setBeanClass(this.transactionServiceFactoryBean.getClass());
 
 			boolean explicitFactoryUsed = false;
 
@@ -134,8 +134,29 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
 					logger.debug("Enabling autowire by type for MapperFactoryBean with name '" + holder.getBeanName()
 							+ "'.");
 				}
-				definition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
+				beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
 			}
+			
+			
+			
+		}
+	}
+
+	private void getFactoryBeanDefinition(BeanDefinitionHolder holder) {
+
+		BeanDefinitionHolder factoryBeanholder = new BeanDefinitionHolder(holder.getBeanDefinition(),"aaa_"+holder.getBeanName());
+		
+		GenericBeanDefinition beanDefinition = (GenericBeanDefinition)factoryBeanholder.getBeanDefinition();
+		
+		
+
+		
+		factoryBeanBeanDefinitionSet.add(factoryBeanholder);
+	}
+
+	private void addFactoryBeanBeanDefinitionHolder(Set<BeanDefinitionHolder> beanDefinitions) {
+		for (BeanDefinitionHolder factoryBeanholder : factoryBeanBeanDefinitionSet) {
+			beanDefinitions.add(factoryBeanholder);
 		}
 	}
 }

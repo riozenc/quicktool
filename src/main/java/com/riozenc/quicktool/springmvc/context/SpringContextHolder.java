@@ -40,7 +40,6 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
 		applicationContext = null;
 	}
 	public static ApplicationContext getApplicationContext(){
-		assertContextInjected();
 		return applicationContext;
 	}
 
