@@ -9,6 +9,7 @@ package com.riozenc.quicktool.mybatis.db;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -38,8 +39,9 @@ public class DbFactory {
 	private static Reader reader;
 
 	private static boolean FLAG = false;
+	private static String defaultDB = null;
 
-	private static Map<String, SqlSessionFactory> DBS = new HashMap<String, SqlSessionFactory>();
+	private static Map<String, SqlSessionFactory> DBS = new LinkedHashMap<String, SqlSessionFactory>();
 
 	private static void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
 		if (DbFactory.sqlSessionFactory == null) {
@@ -69,6 +71,9 @@ public class DbFactory {
 	 */
 	protected static SqlSessionFactory getSqlSessionFactory(String name) throws Exception {
 		if (FLAG) {
+			if (null == name) {
+				name = defaultDB;
+			}
 			return DBS.get(name);
 		} else {
 			throw new DbInitException("数据库未完成初始化...");
@@ -95,8 +100,7 @@ public class DbFactory {
 		String db = Global.getConfig(name);
 		String[] dbs = db.split(",");
 		for (String temp : dbs) {
-			DBS.put(temp, SpringContextHolder.getBean(temp));
-			FLAG = checkSqlSessionFactory(DBS.get(temp));
+			putDB(temp, SpringContextHolder.getBean(temp));
 		}
 	}
 
@@ -133,8 +137,7 @@ public class DbFactory {
 				factoryBean.setConfigLocation(
 						new PathMatchingResourcePatternResolver().getResource("classpath:mybatis-config.xml"));
 
-				DBS.put(temp, factoryBean.getObject());
-				FLAG = checkSqlSessionFactory(DBS.get(temp));
+				putDB(temp, factoryBean.getObject());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -164,6 +167,14 @@ public class DbFactory {
 		if (!FLAG) {
 			LogUtil.getLogger(LOG_TYPE.DB).info("数据库完成初始化...");
 		}
+	}
+
+	private static void putDB(String key, SqlSessionFactory sessionFactory) {
+		if (defaultDB == null) {
+			defaultDB = key;
+		}
+		DBS.put(key, sessionFactory);
+		FLAG = checkSqlSessionFactory(DBS.get(key));
 	}
 
 	/**

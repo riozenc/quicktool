@@ -3,7 +3,7 @@
  * Author:czy
  * Datetime:2016年11月9日 下午12:11:14
  */
-package com.riozenc.quicktool.springmvc.transaction;
+package com.riozenc.quicktool.springmvc.transaction.scanner;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -24,14 +24,16 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.core.type.filter.TypeFilter;
 
-public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
+import com.riozenc.quicktool.springmvc.transaction.bean.TransactionServiceFactoryBean;
 
+public class ClassPathTransactionServiceScanner extends ClassPathBeanDefinitionScanner {
+	public static final String RIOZENC = "RIOZENC_";
 	private Class<? extends Annotation> annotationClass;
 	private Class<?> transactionServiceInterface;
 	private TransactionServiceFactoryBean<?> transactionServiceFactoryBean = new TransactionServiceFactoryBean<Object>();
 	private Set<BeanDefinitionHolder> factoryBeanBeanDefinitionSet = new HashSet<BeanDefinitionHolder>();
 
-	public ClassPathMapperScanner(BeanDefinitionRegistry registry) {
+	public ClassPathTransactionServiceScanner(BeanDefinitionRegistry registry) {
 		super(registry, false);
 		// TODO Auto-generated constructor stub
 	}
@@ -49,12 +51,12 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
 		Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
 
 		if (beanDefinitions.isEmpty()) {
-			logger.warn("No MyBatis mapper was found in '" + Arrays.toString(basePackages)
+			logger.warn("No Transaction Service was found in '" + Arrays.toString(basePackages)
 					+ "' package. Please check your configuration.");
 		} else {
 			processBeanDefinitions(beanDefinitions);
 		}
-		addFactoryBeanBeanDefinitionHolder(beanDefinitions);
+		registerFactoryBeanBeanDefinitionHolder(beanDefinitions);
 		return beanDefinitions;
 	}
 
@@ -149,18 +151,12 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
 		GenericBeanDefinition beanDefinition = (GenericBeanDefinition) holder.getBeanDefinition();
 
 		BeanDefinitionHolder factoryBeanholder = new BeanDefinitionHolder((BeanDefinition) beanDefinition.clone(),
-				"aaa_" + holder.getBeanName());
-
-		// GenericBeanDefinition beanDefinition = (GenericBeanDefinition)
-		// factoryBeanholder.getBeanDefinition();
-
-		// getRegistry().registerBeanDefinition("aaa_" + holder.getBeanName(),
-		// beanDefinition);
+				RIOZENC + holder.getBeanName());
 
 		factoryBeanBeanDefinitionSet.add(factoryBeanholder);
 	}
 
-	private void addFactoryBeanBeanDefinitionHolder(Set<BeanDefinitionHolder> beanDefinitions) {
+	private void registerFactoryBeanBeanDefinitionHolder(Set<BeanDefinitionHolder> beanDefinitions) {
 
 		for (BeanDefinitionHolder factoryBeanholder : factoryBeanBeanDefinitionSet) {
 			BeanDefinitionReaderUtils.registerBeanDefinition(factoryBeanholder, getRegistry());

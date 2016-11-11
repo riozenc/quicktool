@@ -8,50 +8,51 @@ package com.riozenc.quicktool.springmvc.transaction.proxy;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.riozenc.quicktool.common.util.StringUtils;
 import com.riozenc.quicktool.common.util.date.DateUtil;
 import com.riozenc.quicktool.common.util.log.ExceptionLogUtil;
 import com.riozenc.quicktool.common.util.log.LogUtil;
 import com.riozenc.quicktool.common.util.log.LogUtil.LOG_TYPE;
-import com.riozenc.quicktool.springmvc.context.SpringContextHolder;
-import com.riozenc.quicktool.springmvc.transaction.scanner.ClassPathTransactionServiceScanner;
+import com.riozenc.quicktool.mybatis.dao.AbstractDAOSupport;
 
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
-public class TransactionServiceProxyFactory implements MethodInterceptor {
+public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 
-	private static final Logger LOGGER = LogManager.getLogger(TransactionServiceProxyFactory.class);
+	private static final Logger LOGGER = LogManager.getLogger(TransactionServiceProxyFactory2.class);
 
-	private List<SqlSession> sqlSessionList = new ArrayList<SqlSession>();;
+	private LinkedList<SqlSession> sqlSessionList = new LinkedList<SqlSession>();;
 	private Object targetObject;
-	private Class<?> clazz;
 
-	private TransactionServiceProxyFactory() {
+	private TransactionServiceProxyFactory2() {
 	}
 
-	public static TransactionServiceProxyFactory getInstance() {
-		return new TransactionServiceProxyFactory();
+	public static TransactionServiceProxyFactory2 getInstance() {
+		return new TransactionServiceProxyFactory2();
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> T createProxy(Class<T> clazz) throws InstantiationException, IllegalAccessException {
+	public <T> T createProxy(Object obj, AbstractDAOSupport... abstractDAOSupports)
+			throws InstantiationException, IllegalAccessException {
 
-		if (null == clazz) {
+		if (null == obj) {
 			throw new ClassCastException(DateUtil.formatDateTime(new Date()) + "代理对象不存在....");
 		} else {
-			if (clazz instanceof Class) {
-				this.clazz = clazz;
-				targetObjectInjected();
+			if (obj instanceof Class) {
+				this.targetObject = obj;
+				for (AbstractDAOSupport abstractDAOSupport : abstractDAOSupports) {
+					sqlSessionList.add(abstractDAOSupport.getSqlSession());
+				}
 				Enhancer enhancer = new Enhancer();
-				enhancer.setSuperclass(clazz);
+				enhancer.setSuperclass(obj.getClass());
 				enhancer.setCallback(this);
 				return (T) enhancer.create();
 			} else {
@@ -63,7 +64,6 @@ public class TransactionServiceProxyFactory implements MethodInterceptor {
 	@Override
 	public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
 		// TODO Auto-generated method stub
-		targetObjectInjected();
 		String methodName = method.getName();
 		try {
 
@@ -80,14 +80,5 @@ public class TransactionServiceProxyFactory implements MethodInterceptor {
 			// 最终处理
 
 		}
-
 	}
-
-	private void targetObjectInjected() {
-		if (targetObject == null) {
-			targetObject = SpringContextHolder.getBean(
-					ClassPathTransactionServiceScanner.RIOZENC + StringUtils.decapitalize(this.clazz.getSimpleName()));
-		}
-	}
-
 }

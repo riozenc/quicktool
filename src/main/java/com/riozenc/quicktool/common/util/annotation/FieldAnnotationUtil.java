@@ -13,21 +13,18 @@ import java.lang.reflect.Method;
 
 public class FieldAnnotationUtil {
 
-	public static Object getAnnotation(Field field,
-			Class<? extends Annotation> clazz) {
+	public static Object getAnnotation(Field field, Class<? extends Annotation> clazz) {
 		return getAnnotation(field, clazz, null);
 	}
 
-	public static Object getAnnotation(Field field,
-			Class<? extends Annotation> clazz, String methodName) {
+	public static Object getAnnotation(Field field, Class<? extends Annotation> clazz, String methodName) {
 		if (null == methodName) {
 			methodName = "value";
 		}
 		return reflectValue(field, clazz, methodName);
 	}
 
-	private static Object reflectValue(Field field,
-			Class<? extends Annotation> clazz, String methodName) {
+	private static Object reflectValue(Field field, Class<? extends Annotation> clazz, String methodName) {
 		Annotation temp = field.getAnnotation(clazz);
 
 		Method method = null;
@@ -36,6 +33,7 @@ public class FieldAnnotationUtil {
 		}
 
 		try {
+
 			method = clazz.getDeclaredMethod(methodName, null);
 			return method.invoke(temp, new Object[] {});
 		} catch (NoSuchMethodException e) {

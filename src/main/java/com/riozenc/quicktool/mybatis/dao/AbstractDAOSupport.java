@@ -92,4 +92,8 @@ public abstract class AbstractDAOSupport {
 		return NAMESPACE;
 	}
 
+	public SqlSession getSqlSession() {
+		return this.sqlSession;
+	}
+
 }
