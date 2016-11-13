@@ -5,17 +5,44 @@
  */
 package com.riozenc.quicktool.common.util;
 
+import java.lang.reflect.Field;
+
+import org.apache.ibatis.session.SqlSession;
 import org.springframework.util.Assert;
 
 public class ClassUtils {
-	
+
 	/** The package separator character: '.' */
 	private static final char PACKAGE_SEPARATOR = '.';
 	/** The CGLIB class separator: "$$" */
 	public static final String CGLIB_CLASS_SEPARATOR = "$$";
 	/** The inner class separator character: '$' */
 	private static final char INNER_CLASS_SEPARATOR = '$';
-	
+
+	public static Field getField(Class<?> clazz, Class<?> fieldType) {
+		for (Class<?> searchType = clazz; searchType != Object.class; searchType = searchType.getSuperclass()) {
+
+			for (Field field : searchType.getDeclaredFields()) {
+				if (SqlSession.class == fieldType) {
+					return field;
+				}
+			}
+		}
+		return null;
+	}
+
+	public static Field getField(Class<?> clazz, String fieldName) {
+		for (Class<?> searchType = clazz; searchType != Object.class; searchType = searchType.getSuperclass()) {
+
+			for (Field field : searchType.getDeclaredFields()) {
+				if (field.getName().equals(fieldName)) {
+					return field;
+				}
+			}
+		}
+		return null;
+	}
+
 	public static ClassLoader getDefaultClassLoader() {
 		ClassLoader cl = null;
 		try {
@@ -39,12 +66,15 @@ public class ClassUtils {
 		}
 		return cl;
 	}
-	
+
 	/**
 	 * Get the class name without the qualified package name.
-	 * @param className the className to get the short name for
+	 * 
+	 * @param className
+	 *            the className to get the short name for
 	 * @return the class name of the class without the package name
-	 * @throws IllegalArgumentException if the className is empty
+	 * @throws IllegalArgumentException
+	 *             if the className is empty
 	 */
 	public static String getShortName(String className) {
 		Assert.hasLength(className, "Class name must not be empty");

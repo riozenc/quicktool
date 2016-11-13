@@ -40,7 +40,7 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> T createProxy(Object obj, AbstractDAOSupport... abstractDAOSupports)
+	public <T> T createProxy(Object obj, List<AbstractDAOSupport> abstractDAOSupports)
 			throws InstantiationException, IllegalAccessException {
 
 		if (null == obj) {

@@ -5,27 +5,31 @@
  */
 package com.riozenc.quicktool.springmvc.transaction.bean;
 
- java.util.Map;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
-import org.springframework.beans.factory.support.SimpleInstantiationStrategy;
 
 import com.riozenc.quicktool.annotation.TransactionDAO;
+import com.riozenc.quicktool.common.util.ClassUtils;
 import com.riozenc.quicktool.common.util.annotation.FieldAnnotationUtil;
+import com.riozenc.quicktool.common.util.reflect.ReflectUtil;
+import com.riozenc.quicktool.mybatis.dao.AbstractDAOSupport;
 import com.riozenc.quicktool.mybatis.db.SqlSessionManager;
 import com.riozenc.quicktool.springmvc.transaction.proxy.TransactionServiceProxyFactory2;
 
 public class TransactionServiceFactoryBean<T> implements FactoryBean<T> {
 
-	private Class<T> serviceInterface;
-
 	private static Map<String, BeanDefinitionHolder> definitionHolderMap = new ConcurrentHashMap<>();
+	private Class<T> serviceInterface;
+	private List<AbstractDAOSupport> params = new ArrayList<AbstractDAOSupport>();
 
 	public TransactionServiceFactoryBean() {
 		// intentionally empty
@@ -46,7 +50,7 @@ public class TransactionServiceFactoryBean<T> implements FactoryBean<T> {
 		if (this.serviceInterface == null) {
 			afterPropertiesSet();
 		}
-		return build();
+		return TransactionServiceProxyFactory2.getInstance().createProxy(build(), params);
 	}
 
 	@Override
@@ -69,27 +73,43 @@ public class TransactionServiceFactoryBean<T> implements FactoryBean<T> {
 		throw new Exception("没有可实例化的目标...");
 	}
 
-	private T build() {
-		return TransactionServiceProxyFactory2.getInstance().createProxy(serviceInterface);
+	private T build() throws Exception {
+
+		return processTransactionDAO();
 	}
 
-	private void post() throws Exception {
-		Field[] fields = this.serviceInterface.getDeclaredFields();
-		for (Field field : fields) {
+	private T processTransactionDAO() throws Exception {
+		T service = this.serviceInterface.newInstance();
 
-			if (null != field.getAnnotation(TransactionDAO.class)) {
-				String dbName = (String) FieldAnnotationUtil.getAnnotation(field, TransactionDAO.class);
+		Field[] fields = this.serviceInterface.getDeclaredFields();
+		for (Field dao : fields) {
+
+			if (null != dao.getAnnotation(TransactionDAO.class)) {
+				String dbName = (String) FieldAnnotationUtil.getAnnotation(dao, TransactionDAO.class);
 				SqlSession sqlSession = SqlSessionManager.getSession(dbName, ExecutorType.SIMPLE);
 
-				BeanDefinitionHolder beanDefinitionHolder = definitionHolderMap.get(field.getName());
+				BeanDefinitionHolder beanDefinitionHolder = definitionHolderMap.get(dao.getName());
 				if (beanDefinitionHolder == null) {
-					throw new Exception(field.getName() + " is not found @" + this.serviceInterface.getSimpleName());
+					throw new Exception(dao.getName() + " is not found @TransactionDAO!");
 				}
-				
-				new SimpleInstantiationStrategy().instantiate(bd, beanName, owner, ctor, args);
-			}
 
+				// Object daoParam = BeanUtils.instantiate(dao.getType());
+				AbstractDAOSupport abstractDAOSupport = (AbstractDAOSupport) BeanUtils.instantiate(dao.getType());
+
+				ReflectUtil.setFieldValue(service, dao.getName(), abstractDAOSupport);// 给service赋值dao
+
+				Field sqlSessionField = ClassUtils.getField(dao.getType(), SqlSession.class);
+
+				if (sqlSessionField == null) {
+					throw new Exception(dao.getName() + " is not found SqlSession support!");
+				}
+
+				// 给dao赋值SqlSession
+				ReflectUtil.setFieldValue(abstractDAOSupport, sqlSessionField.getName(), sqlSession);
+				params.add(abstractDAOSupport);
+			}
 		}
 
+		return service;
 	}
 }
