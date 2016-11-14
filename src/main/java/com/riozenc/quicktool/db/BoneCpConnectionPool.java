@@ -6,7 +6,12 @@
 package com.riozenc.quicktool.db;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.jolbox.bonecp.BoneCP;
@@ -14,6 +19,7 @@ import com.jolbox.bonecp.BoneCPConfig;
 import com.jolbox.bonecp.Statistics;
 import com.riozenc.quicktool.common.util.log.LogUtil;
 import com.riozenc.quicktool.common.util.log.LogUtil.LOG_TYPE;
+import com.riozenc.quicktool.common.util.reflect.ResultSetCaseUtil;
 import com.riozenc.quicktool.exception.DbInitException;
 
 public class BoneCpConnectionPool {
@@ -25,7 +31,8 @@ public class BoneCpConnectionPool {
 
 	static {
 		try {
-			Class.forName("oracle.jdbc.driver.OracleDriver");
+//			Class.forName("oracle.jdbc.driver.OracleDriver");
+			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -40,16 +47,19 @@ public class BoneCpConnectionPool {
 		return STATISTICS;
 	}
 
+
+
 	private static void initConfig() {
 		if (!isInit) {
 			CONFIG = new BoneCPConfig();
 
-			CONFIG.setJdbcUrl("jdbc:oracle:thin:@10.164.10.146:1521:energydb"); // set
-																				// the
-																				// JDBC
-																				// url
-			CONFIG.setUsername("df6100e"); // set the username
-			CONFIG.setPassword("wisdom.df6100"); // set the password
+			// set the JDBC url
+			// CONFIG.setJdbcUrl("jdbc:oracle:thin:@10.164.10.146:1521:energydb");
+			CONFIG.setJdbcUrl("jdbc:mysql://123.130.125.48:3306/temp?characterEncoding=utf-8");
+			// set the username
+			CONFIG.setUsername("root");
+			// set the password
+			CONFIG.setPassword("root@123");
 
 			CONFIG.setIdleMaxAge(60 * 5, TimeUnit.SECONDS);// 连接池中未使用的链接最大存活时间，单位是分，默认值：60，如果要永远存活设置为0
 			CONFIG.setMaxConnectionsPerPartition(5);// 每个分区最大的连接数
@@ -101,3 +111,4 @@ public class BoneCpConnectionPool {
 	}
 
 }
+

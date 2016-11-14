@@ -23,7 +23,7 @@ public class ClassUtils {
 		for (Class<?> searchType = clazz; searchType != Object.class; searchType = searchType.getSuperclass()) {
 
 			for (Field field : searchType.getDeclaredFields()) {
-				if (SqlSession.class == fieldType) {
+				if (SqlSession.class == field.getType()) {
 					return field;
 				}
 			}

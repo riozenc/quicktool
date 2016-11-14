@@ -8,7 +8,6 @@ package com.riozenc.quicktool.mybatis.db;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -71,7 +70,7 @@ public class DbFactory {
 	 */
 	protected static SqlSessionFactory getSqlSessionFactory(String name) throws Exception {
 		if (FLAG) {
-			if (null == name) {
+			if (null == name || "".equals(name)) {
 				name = defaultDB;
 			}
 			return DBS.get(name);

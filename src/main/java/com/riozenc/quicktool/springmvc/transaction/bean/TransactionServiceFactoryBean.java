@@ -74,42 +74,41 @@ public class TransactionServiceFactoryBean<T> implements FactoryBean<T> {
 	}
 
 	private T build() throws Exception {
-
-		return processTransactionDAO();
-	}
-
-	private T processTransactionDAO() throws Exception {
 		T service = this.serviceInterface.newInstance();
-
 		Field[] fields = this.serviceInterface.getDeclaredFields();
 		for (Field dao : fields) {
-
 			if (null != dao.getAnnotation(TransactionDAO.class)) {
-				String dbName = (String) FieldAnnotationUtil.getAnnotation(dao, TransactionDAO.class);
-				SqlSession sqlSession = SqlSessionManager.getSession(dbName, ExecutorType.SIMPLE);
 
-				BeanDefinitionHolder beanDefinitionHolder = definitionHolderMap.get(dao.getName());
-				if (beanDefinitionHolder == null) {
-					throw new Exception(dao.getName() + " is not found @TransactionDAO!");
-				}
-
-				// Object daoParam = BeanUtils.instantiate(dao.getType());
-				AbstractDAOSupport abstractDAOSupport = (AbstractDAOSupport) BeanUtils.instantiate(dao.getType());
-
-				ReflectUtil.setFieldValue(service, dao.getName(), abstractDAOSupport);// 给service赋值dao
-
-				Field sqlSessionField = ClassUtils.getField(dao.getType(), SqlSession.class);
-
-				if (sqlSessionField == null) {
-					throw new Exception(dao.getName() + " is not found SqlSession support!");
-				}
-
-				// 给dao赋值SqlSession
-				ReflectUtil.setFieldValue(abstractDAOSupport, sqlSessionField.getName(), sqlSession);
-				params.add(abstractDAOSupport);
+				ReflectUtil.setFieldValue(service, dao.getName(), processTransactionDAO(dao));// 给service赋值dao
 			}
 		}
 
 		return service;
+	}
+
+	private AbstractDAOSupport processTransactionDAO(Field dao) throws Exception {
+
+		if (null != dao.getAnnotation(TransactionDAO.class)) {
+			String dbName = (String) FieldAnnotationUtil.getAnnotation(dao, TransactionDAO.class);
+			SqlSession sqlSession = SqlSessionManager.getSession(dbName, ExecutorType.SIMPLE);
+
+			BeanDefinitionHolder beanDefinitionHolder = definitionHolderMap.get(dao.getName());
+			if (beanDefinitionHolder == null) {
+				throw new Exception(dao.getName() + " is not found @TransactionDAO!");
+			}
+
+			AbstractDAOSupport abstractDAOSupport = (AbstractDAOSupport) BeanUtils.instantiate(dao.getType());
+			Field sqlSessionField = ClassUtils.getField(dao.getType(), SqlSession.class);
+
+			if (sqlSessionField == null) {
+				throw new Exception(dao.getName() + " is not found SqlSession support!");
+			}
+
+			// 给dao赋值SqlSession
+			ReflectUtil.setFieldValue(abstractDAOSupport, sqlSessionField.getName(), sqlSession);
+			params.add(abstractDAOSupport);
+			return abstractDAOSupport;
+		}
+		return null;
 	}
 }

@@ -6,7 +6,6 @@
 package com.riozenc.quicktool.springmvc.transaction.proxy;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,7 +45,7 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 		if (null == obj) {
 			throw new ClassCastException(DateUtil.formatDateTime(new Date()) + "代理对象不存在....");
 		} else {
-			if (obj instanceof Class) {
+			if (obj instanceof Object) {
 				this.targetObject = obj;
 				for (AbstractDAOSupport abstractDAOSupport : abstractDAOSupports) {
 					sqlSessionList.add(abstractDAOSupport.getSqlSession());
@@ -71,14 +70,26 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 
 			Object rev = method.invoke(targetObject, args);
 
+			for (SqlSession sqlSession : sqlSessionList) {
+//				sqlSession.commit(true);
+				sqlSession.rollback(true);
+			}
+
 			return rev;
 		} catch (Exception e) {
+
+			for (SqlSession sqlSession : sqlSessionList) {
+				sqlSession.rollback(true);
+			}
 
 			LogUtil.getLogger(LOG_TYPE.ERROR).error(ExceptionLogUtil.log(e));
 			return null;
 		} finally {
 			// 最终处理
-
+			for (SqlSession sqlSession : sqlSessionList) {
+				sqlSession.close();
+			}
 		}
 	}
+
 }

@@ -43,7 +43,7 @@ public class ResultSetCaseUtil {
 			for (; i < cs.length; i++) {
 				if (cs[i] == '_') {
 					i++;
-					sb.append(cs[i]);
+					sb.append(Character.toUpperCase(cs[i]));
 				} else {
 					sb.append(Character.toLowerCase(cs[i]));
 				}
@@ -53,6 +53,10 @@ public class ResultSetCaseUtil {
 		}
 
 		return sb.toString();
+	}
+
+	public static void main(String[] args) {
+		System.out.println(lowerCase("qysx_id"));
 	}
 
 	/**
@@ -90,7 +94,12 @@ public class ResultSetCaseUtil {
 					temp = lowerCase(metaData.getColumnLabel(i + 1));
 					//
 					// field = classEntity.getFieldMap().get(temp);
-					field = clazz.getField(temp);
+
+					try {
+						field = clazz.getDeclaredField(temp);
+					} catch (NoSuchFieldException e) {
+						continue;
+					}
 					if (null == field) {
 						continue;
 					}
