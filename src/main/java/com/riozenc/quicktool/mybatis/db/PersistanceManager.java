@@ -7,6 +7,7 @@
  */
 package com.riozenc.quicktool.mybatis.db;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +34,17 @@ public class PersistanceManager {
 		this.session = session;
 		// 自动提交
 		// this.session.getConnection().setAutoCommit(true);
+	}
+
+	public PersistanceManager(SqlSession session, boolean autoCommit) {
+		this.session = session;
+		// 自动提交
+		try {
+			this.session.getConnection().setAutoCommit(autoCommit);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			throw new RuntimeException(e.getMessage());
+		}
 	}
 
 	public PersistanceManager() {

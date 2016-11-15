@@ -16,76 +16,59 @@ import com.riozenc.quicktool.proxy.DAOProxyFactory;
 
 public abstract class AbstractDAOSupport {
 	private ExecutorType executorType = ExecutorType.SIMPLE;
-	private boolean flag = true;
+	private boolean isProxy = false;
+	private boolean autoCommit = false;
 	private SqlSession sqlSession = null;
-	private static String NAMESPACE = null;
+	private String NAMESPACE = null;
 
 	public AbstractDAOSupport() {
 
 	}
 
-	public AbstractDAOSupport(ExecutorType executorType) {
-		this.executorType = executorType;
-	}
-
-	public AbstractDAOSupport(ExecutorType executorType, boolean flag) {
-		this.executorType = executorType;
-		this.flag = flag;
-	}
+	// public AbstractDAOSupport(ExecutorType executorType) {
+	// this.executorType = executorType;
+	// }
+	//
+	// public AbstractDAOSupport(ExecutorType executorType, boolean isProxy) {
+	// this.executorType = executorType;
+	// this.isProxy = isProxy;
+	// }
 
 	protected PersistanceManager getPersistanceManager() {
-
-		return getPersistanceManager(this.executorType, this.flag);
-
+		return getPersistanceManager(this.executorType, this.autoCommit, this.isProxy);
 	}
 
-	protected PersistanceManager getPersistanceManager(String dbName) {
+	protected PersistanceManager getPersistanceManager(boolean autoCommit) {
 
-		return getPersistanceManager(dbName, this.executorType, this.flag);
-
-	}
-
-	protected PersistanceManager getPersistanceManager(boolean flag) {
-		return getPersistanceManager(this.executorType, flag);
+		return getPersistanceManager(this.executorType, autoCommit, this.isProxy);
 	}
 
 	protected PersistanceManager getPersistanceManager(ExecutorType executorType) {
-		return getPersistanceManager(executorType, this.flag);
+		return getPersistanceManager(executorType, this.autoCommit, this.isProxy);
 	}
 
-	protected PersistanceManager getPersistanceManager(ExecutorType executorType, boolean flag) {
+	protected PersistanceManager getPersistanceManager(ExecutorType executorType, boolean autoCommit, boolean isProxy) {
+
+		return getPersistanceManager("", executorType, autoCommit, isProxy);
+	}
+
+	protected PersistanceManager getPersistanceManager(String dbName, ExecutorType executorType, boolean autoCommit,
+			boolean isProxy) {
 
 		System.out.println(Thread.currentThread().getStackTrace()[3].getMethodName());
-
 		Long l = System.currentTimeMillis();
-
 		sqlSession = SqlSessionManager.getSession(executorType);
 		LogUtil.getLogger(LOG_TYPE.DB).info("获取SqlSession用时:" + (System.currentTimeMillis() - l));
 
-		if (flag) {
-			return (PersistanceManager) DAOProxyFactory.getInstance().createProxy(new PersistanceManager(sqlSession));
+		if (isProxy) {
+			return (PersistanceManager) DAOProxyFactory.getInstance()
+					.createProxy(new PersistanceManager(sqlSession, autoCommit));
 		} else {
-			return new PersistanceManager(sqlSession);
+			return new PersistanceManager(sqlSession, autoCommit);
 		}
 	}
 
-	protected PersistanceManager getPersistanceManager(String dbName, ExecutorType executorType, boolean flag) {
-
-		System.out.println(Thread.currentThread().getStackTrace()[3].getMethodName());
-
-		Long l = System.currentTimeMillis();
-
-		sqlSession = SqlSessionManager.getSession(dbName, executorType);
-		LogUtil.getLogger(LOG_TYPE.DB).info("获取SqlSession用时:" + (System.currentTimeMillis() - l));
-
-		if (flag) {
-			return (PersistanceManager) DAOProxyFactory.getInstance().createProxy(new PersistanceManager(sqlSession));
-		} else {
-			return new PersistanceManager(sqlSession);
-		}
-	}
-
-	protected String getNamespace() {
+	public String getNamespace() {
 		if (null == NAMESPACE) {
 			NAMESPACE = this.getClass().getName();
 		}

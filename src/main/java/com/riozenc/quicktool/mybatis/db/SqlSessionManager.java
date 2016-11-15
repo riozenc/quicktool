@@ -25,6 +25,20 @@ public class SqlSessionManager {
 		return getSession(ExecutorType.SIMPLE);
 	}
 
+	public static SqlSession getSession(String dbName, boolean autoCommit) {
+		synchronized (b) {
+			try {
+				return DbFactory.getSqlSessionFactory(dbName).openSession(autoCommit);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		// 不自动提交
+		return sqlSessionFactory.openSession(autoCommit);
+	}
+
 	public static SqlSession getSession(ExecutorType executorType) {
 		if (null == sqlSessionFactory) {
 			synchronized (b) {
@@ -36,16 +50,16 @@ public class SqlSessionManager {
 	}
 
 	public static SqlSession getSession(String dbName, ExecutorType executorType) {
-		if (null == sqlSessionFactory) {
-			synchronized (b) {
-				try {
-					sqlSessionFactory = DbFactory.getSqlSessionFactory(dbName);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+
+		synchronized (b) {
+			try {
+				return DbFactory.getSqlSessionFactory(dbName).openSession(false);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
+
 		// 不自动提交
 		return sqlSessionFactory.openSession(executorType, false);
 	}

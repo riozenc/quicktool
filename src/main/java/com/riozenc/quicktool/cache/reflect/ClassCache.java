@@ -19,7 +19,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.riozenc.quicktool.annotation.CharacterLength;
 import com.riozenc.quicktool.cache.reflect.entity.ClassEntity;
-import com.riozenc.quicktool.common.util.annotation.FieldAnnotationUtil;
+import com.riozenc.quicktool.common.util.annotation.AnnotationUtil;
 import com.riozenc.quicktool.common.util.file.FileIoUtil;
 import com.riozenc.quicktool.exception.CacheInitException;
 
@@ -68,7 +68,7 @@ public class ClassCache {
 
 				for (Field field : fields) {
 					fieldMap.put(field.getName(), field);
-					charcterLengthList.add((Integer) FieldAnnotationUtil.getAnnotation(field, CharacterLength.class));
+					charcterLengthList.add((Integer) AnnotationUtil.getAnnotationValue(field, CharacterLength.class));
 				}
 
 				entity.setFieldMap(fieldMap);

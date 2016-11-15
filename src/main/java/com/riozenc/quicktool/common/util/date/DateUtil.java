@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.riozenc.quicktool.annotation.DateAnnotation;
-import com.riozenc.quicktool.common.util.annotation.FieldAnnotationUtil;
+import com.riozenc.quicktool.common.util.annotation.AnnotationUtil;
 
 /**
  *
@@ -93,7 +93,7 @@ public class DateUtil {
 	 */
 	public static String getFormat(Field field) {
 
-		if (DateAnnotation.DATE_TYPE.DATE == FieldAnnotationUtil.getAnnotation(
+		if (DateAnnotation.DATE_TYPE.DATE == AnnotationUtil.getAnnotationValue(
 				field, DateAnnotation.class, "value")) {
 			return DATE;
 		} else {

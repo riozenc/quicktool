@@ -18,7 +18,7 @@ import com.riozenc.quicktool.annotation.DateAnnotation;
 import com.riozenc.quicktool.cache.reflect.ClassCache;
 import com.riozenc.quicktool.cache.reflect.entity.ClassEntity;
 import com.riozenc.quicktool.common.util.StringUtils;
-import com.riozenc.quicktool.common.util.annotation.FieldAnnotationUtil;
+import com.riozenc.quicktool.common.util.annotation.AnnotationUtil;
 import com.riozenc.quicktool.common.util.date.DateUtil;
 import com.riozenc.quicktool.common.util.reflect.MethodGen;
 
@@ -296,7 +296,7 @@ public class SqlUtil {
 		} else if (Date.class.equals(field.getType())) {
 			// to_date('2015-03-25 14:16:21','YYYY-MM-DD hh24:mi:ss')
 
-			Object temp = FieldAnnotationUtil.getAnnotation(field,
+			Object temp = AnnotationUtil.getAnnotationValue(field,
 					DateAnnotation.class, "value");
 
 			if (DateAnnotation.DATE_TYPE.DATE == temp) {
