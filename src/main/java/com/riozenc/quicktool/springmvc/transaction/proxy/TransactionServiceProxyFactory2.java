@@ -69,6 +69,11 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 		// TODO Auto-generated method stub
 		buildDAO();
 		String methodName = method.getName();
+
+		if (methodName.startsWith("get") || methodName.startsWith("find")) {// 查询方法无事务
+			Object rev = method.invoke(targetObject, args);
+			return rev;
+		}
 		try {
 			Object rev = method.invoke(targetObject, args);
 			for (Entry<String, SqlSession> entry : sqlSessionMap.entrySet()) {
