@@ -8,6 +8,7 @@ package com.riozenc.quicktool.common.util.cryption.en;
 import java.security.SecureRandom;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.Validate;
 
 public class WebPasswordUtils {
 	private static SecureRandom random = new SecureRandom();
@@ -17,9 +18,16 @@ public class WebPasswordUtils {
 	private static final String ALGORITHM_NAME = "SHA-512";
 
 	public static String encodePassword(String password) throws Exception {
-		byte[] salt = new byte[8];
-		random.nextBytes(salt);
+		byte[] salt = generateSalt(8);
 		byte[] hash = HashUtils.getHash(ALGORITHM_NAME, password.getBytes(), salt, Iterations);
 		return new String(Hex.encodeHex(salt)) + new String(Hex.encodeHex(hash));
+	}
+
+	private static byte[] generateSalt(int numBytes) {
+		Validate.isTrue(numBytes > 0, "numBytes argument must be a positive integer (1 or larger)", numBytes);
+
+		byte[] bytes = new byte[numBytes];
+		random.nextBytes(bytes);
+		return bytes;
 	}
 }
