@@ -16,6 +16,7 @@ import org.springframework.beans.factory.config.BeanDefinitionHolder;
 
 import com.riozenc.quicktool.annotation.TransactionDAO;
 import com.riozenc.quicktool.common.util.ClassUtils;
+import com.riozenc.quicktool.common.util.StringUtils;
 import com.riozenc.quicktool.common.util.reflect.ReflectUtil;
 import com.riozenc.quicktool.mybatis.dao.AbstractTransactionDAOSupport;
 import com.riozenc.quicktool.springmvc.transaction.proxy.TransactionServiceProxyFactory2;
@@ -80,7 +81,8 @@ public class TransactionServiceFactoryBean<T> implements FactoryBean<T> {
 
 	private AbstractTransactionDAOSupport processTransactionDAO(Field dao) throws Exception {
 		if (null != dao.getAnnotation(TransactionDAO.class)) {
-			BeanDefinitionHolder beanDefinitionHolder = definitionHolderMap.get(dao.getName());
+			
+			BeanDefinitionHolder beanDefinitionHolder = definitionHolderMap.get(StringUtils.decapitalize(dao.getType().getSimpleName()));
 			if (beanDefinitionHolder == null) {
 				throw new Exception(dao.getName() + " is not found @TransactionDAO!");
 			}
@@ -92,5 +94,10 @@ public class TransactionServiceFactoryBean<T> implements FactoryBean<T> {
 			return abstractDAOSupport;
 		}
 		return null;
+	}
+	
+	public static void main(String[] args) {
+		String s = "UserDAO";
+		System.out.println(StringUtils.decapitalize(s));
 	}
 }

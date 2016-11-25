@@ -34,7 +34,7 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 
 	private static final Logger LOGGER = LogManager.getLogger(TransactionServiceProxyFactory2.class);
 
-	private LinkedHashMap<String, SqlSession> sqlSessionMap = new LinkedHashMap<String, SqlSession>();;
+	private LinkedHashMap<Integer, SqlSession> sqlSessionMap = new LinkedHashMap<Integer, SqlSession>();;
 	private Object targetObject;
 	private Class<?> clazz;
 
@@ -76,7 +76,7 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 		}
 		try {
 			Object rev = method.invoke(targetObject, args);
-			for (Entry<String, SqlSession> entry : sqlSessionMap.entrySet()) {
+			for (Entry<Integer, SqlSession> entry : sqlSessionMap.entrySet()) {
 				if (entry.getValue().getConnection().getAutoCommit()) {
 					throw new Exception(methodName + "方法存在事务自动提交...");
 				}
@@ -84,7 +84,7 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 			}
 			return rev;
 		} catch (Exception e) {
-			for (Entry<String, SqlSession> entry : sqlSessionMap.entrySet()) {
+			for (Entry<Integer, SqlSession> entry : sqlSessionMap.entrySet()) {
 				entry.getValue().getConnection().rollback();
 			}
 
@@ -92,7 +92,7 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 			return null;
 		} finally {
 			// 最终处理
-			for (Entry<String, SqlSession> entry : sqlSessionMap.entrySet()) {
+			for (Entry<Integer, SqlSession> entry : sqlSessionMap.entrySet()) {
 				close(entry.getValue());
 			}
 		}
@@ -114,11 +114,30 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 		if (dbName.length() < 1) {
 			dbName = (String) AnnotationUtil.getAnnotationValue(dao.getType(), TransactionDAO.class);
 		}
-		SqlSession sqlSession = SqlSessionManager.getSession(dbName, false);
-		sqlSession.getConnection().setAutoCommit(false);// 不自动提交
-		close(sqlSessionMap.put(abstractDAOSupport.getNamespace(), sqlSession));
-		ReflectUtil.setFieldValue(abstractDAOSupport, "sqlSession", sqlSession);
-		return sqlSession;
+
+		SqlSession oldSqlSession = abstractDAOSupport.getSqlSession();
+		if (!isValidSqlSession(oldSqlSession)) {
+			SqlSession sqlSession = SqlSessionManager.getSession(dbName, false);
+			sqlSession.getConnection().setAutoCommit(false);// 不自动提交
+			close(sqlSessionMap.put(abstractDAOSupport.hashCode(), sqlSession));
+			ReflectUtil.setFieldValue(abstractDAOSupport, "sqlSession", sqlSession);
+			return sqlSession;
+		}
+		return oldSqlSession;
+	}
+
+	private boolean isValidSqlSession(SqlSession sqlSession) {
+		try {
+			if (sqlSession ==null || sqlSession.getConnection().isClosed()) {
+				return false;
+			} else {
+				return true;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	private void close(SqlSession sqlSession) {

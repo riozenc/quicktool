@@ -18,6 +18,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class JSONUtil {
 
 	private static ObjectMapper objectMapper = new ObjectMapper();
+	private static final int SUCCESS = 0;
+	private static final int FAILED = 1;
 
 	/**
 	 * 对象输出json
@@ -34,6 +36,10 @@ public class JSONUtil {
 		}
 	}
 
+	public static String writeSuccessObject(Object object) {
+		return "{\"status\":" + SUCCESS + ",\"result\":\"" + toJsonString(object) + "\"}";
+	}
+
 	/**
 	 * 输出成功信息
 	 * 
@@ -42,7 +48,7 @@ public class JSONUtil {
 	 * @throws IOException
 	 */
 	public static void writeSuccessMsg(String msg, HttpServletResponse response) throws IOException {
-		JSONUtil.writeResponse("{\"success\":true,\"msg\":\"" + msg + "\"}", response);
+		JSONUtil.writeResponse("{\"status\":" + SUCCESS + ",\"msg\":\"" + msg + "\"}", response);
 	}
 
 	/**
@@ -53,7 +59,7 @@ public class JSONUtil {
 	 * @throws IOException
 	 */
 	public static String writeSuccessMsg(String msg) {
-		return "{\"success\":true,\"msg\":\"" + msg + "\"}";
+		return "{\"status\":" + SUCCESS + ",\"msg\":\"" + msg + "\"}";
 	}
 
 	/**
@@ -63,7 +69,7 @@ public class JSONUtil {
 	 * @throws IOException
 	 */
 	public static void writeSuccess(HttpServletResponse response) throws IOException {
-		JSONUtil.writeResponse("{\"success\":true}", response);
+		JSONUtil.writeResponse("{\"status\":" + SUCCESS + "}", response);
 	}
 
 	/**
@@ -73,7 +79,7 @@ public class JSONUtil {
 	 * @throws IOException
 	 */
 	public static void writeError(HttpServletResponse response) throws IOException {
-		JSONUtil.writeResponse("{\"success\":false}", response);
+		JSONUtil.writeResponse("{\"status\":" + FAILED + "}", response);
 	}
 
 	/**
@@ -83,7 +89,7 @@ public class JSONUtil {
 	 * @throws IOException
 	 */
 	public static void writeErrorMsg(String msg, HttpServletResponse response) throws IOException {
-		JSONUtil.writeResponse("{\"success\":false,\"msg\":\"" + msg + "\"}", response);
+		JSONUtil.writeResponse("{\"status\":" + FAILED + ",\"msg\":\"" + msg + "\"}", response);
 	}
 
 	/**
@@ -93,7 +99,7 @@ public class JSONUtil {
 	 * @throws IOException
 	 */
 	public static String writeErrorMsg(String msg) throws IOException {
-		return "{\"success\":false,\"msg\":\"" + msg + "\"}";
+		return "{\"status\":" + FAILED + ",\"msg\":\"" + msg + "\"}";
 	}
 
 	public static void wirteInfo(String msg, HttpServletResponse response) throws IOException {
