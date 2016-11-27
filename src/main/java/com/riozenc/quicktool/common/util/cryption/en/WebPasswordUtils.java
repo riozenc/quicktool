@@ -17,10 +17,16 @@ public class WebPasswordUtils {
 	// MD2 MD5 SHA-1 SHA-256 SHA-384 SHA-512
 	private static final String ALGORITHM_NAME = "SHA-512";
 
-	public static String encodePassword(String password) throws Exception {
-		byte[] salt = generateSalt(8);
-		byte[] hash = HashUtils.getHash(ALGORITHM_NAME, password.getBytes(), salt, Iterations);
-		return new String(Hex.encodeHex(salt)) + new String(Hex.encodeHex(hash));
+	public static String encodePassword(String password) {
+		try {
+			byte[] salt = generateSalt(8);
+			byte[] hash = HashUtils.getHash(ALGORITHM_NAME, password.getBytes(), salt, Iterations);
+			return new String(Hex.encodeHex(salt)) + new String(Hex.encodeHex(hash));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	private static byte[] generateSalt(int numBytes) {

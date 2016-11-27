@@ -133,7 +133,7 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 			} else {
 				return true;
 			}
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;

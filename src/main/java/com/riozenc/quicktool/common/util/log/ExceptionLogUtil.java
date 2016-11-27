@@ -33,6 +33,21 @@ public class ExceptionLogUtil {
 			sb.append("\tat ");
 			sb.append(stackTraceElement.toString());
 		}
+
+		if (e.getCause() != null) {
+			sb.append(log(e.getCause()));
+		}
+
+		// StackTraceElement[] stackTraceElements = e.getStackTrace();
+		// if (null != e.getMessage()) {
+		// sb.append(e.getMessage()).append("\r\n");
+		// }
+		// sb.append(e.getClass().getName());
+		// for (StackTraceElement stackTraceElement : stackTraceElements) {
+		// sb.append("\r\n");
+		// sb.append("\tat ");
+		// sb.append(stackTraceElement.toString());
+		// }
 		return sb.toString();
 	}
 
@@ -48,23 +63,24 @@ public class ExceptionLogUtil {
 	}
 
 	public static String log(Throwable throwable) {
+
 		StringBuffer sb = new StringBuffer();
+
 		if (null != throwable) {
 			sb.append("Caused by: ").append(throwable.getClass().getCanonicalName())
 					.append(": " + throwable.getMessage() + "\n");
 			while (throwable != null) {
 				for (StackTraceElement ste : throwable.getStackTrace()) {
 					sb.append(ste.getClassName() + "!" + ste.getMethodName() + "!" + ste.getFileName() + "!"
-							+ ste.getLineNumber());
+							+ ste.getLineNumber()+"\r\n");
 				}
 				throwable = throwable.getCause();
 				if (throwable != null) {
 					sb.append("Caused by: " + throwable.getClass().getCanonicalName() + " : " + throwable.getMessage());
 				}
 			}
+
 		}
 		return sb.toString();
-
 	}
-
 }
