@@ -8,12 +8,21 @@
 package com.riozenc.quicktool.common.util.json;
 
 public class JSONGrid {
+	private int status = 0;
 	private int total = 0;
 	private Object rows;
 
 	public JSONGrid(int total, Object rows) {
 		this.total = total;
 		this.rows = rows;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
 	}
 
 	public int getTotal() {
@@ -31,4 +40,5 @@ public class JSONGrid {
 	public void setRows(Object rows) {
 		this.rows = rows;
 	}
+
 }

@@ -31,13 +31,25 @@ public class JSONUtil {
 		try {
 			return objectMapper.writeValueAsString(object);
 		} catch (IOException e) {
-			System.out.println("write to json string error:" + object);
+			System.err.println("write to json string error:" + object);
 			return null;
 		}
 	}
 
-	public static String writeSuccessObject(Object object) {
-		return "{\"status\":" + SUCCESS + ",\"result\":\"" + toJsonString(object) + "\"}";
+	/**
+	 * 生成object的json字符串,一个对象
+	 * 
+	 * @param object
+	 * @return
+	 */
+	public static String getJsonResult(Object object) {
+
+		if (object instanceof List) {
+			List<?> list = (List<?>) object;
+			return toJsonString(new JSONResult(1, list.size(), list));
+		}
+
+		return toJsonString(new JSONResult(1, 1, object));
 	}
 
 	/**
