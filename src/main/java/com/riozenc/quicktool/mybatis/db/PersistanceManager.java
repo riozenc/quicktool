@@ -44,7 +44,7 @@ public class PersistanceManager {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			throw new RuntimeException(e.getMessage());
-		}
+		}	
 	}
 
 	public PersistanceManager() {
