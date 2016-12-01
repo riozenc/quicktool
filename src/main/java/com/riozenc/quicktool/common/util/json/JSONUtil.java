@@ -110,7 +110,7 @@ public class JSONUtil {
 	 * @param response
 	 * @throws IOException
 	 */
-	public static String writeErrorMsg(String msg) throws IOException {
+	public static String writeErrorMsg(String msg)  {
 		return "{\"status\":" + FAILED + ",\"msg\":\"" + msg + "\"}";
 	}
 
