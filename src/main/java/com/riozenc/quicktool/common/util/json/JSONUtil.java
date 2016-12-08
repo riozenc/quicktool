@@ -46,10 +46,10 @@ public class JSONUtil {
 
 		if (object instanceof List) {
 			List<?> list = (List<?>) object;
-			return toJsonString(new JSONResult(1, list.size(), list));
+			return toJsonString(new JSONResult(0, list.size(), list));
 		}
 
-		return toJsonString(new JSONResult(1, 1, object));
+		return toJsonString(new JSONResult(0, 1, object));
 	}
 
 	/**

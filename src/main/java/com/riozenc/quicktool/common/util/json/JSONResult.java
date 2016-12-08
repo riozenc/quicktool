@@ -8,12 +8,12 @@ package com.riozenc.quicktool.common.util.json;
 public class JSONResult {
 	private int status = 0;// 状态 0成功 1失败
 	private int total = 0;// 数量
-	private Object object;// 对象
+	private Object result;// 对象
 
-	public JSONResult(int status, int total, Object object) {
+	public JSONResult(int status, int total, Object result) {
 		this.total = total;
 		this.status = status;
-		this.object = object;
+		this.result = result;
 	}
 
 	public int getStatus() {
@@ -24,12 +24,12 @@ public class JSONResult {
 		this.status = status;
 	}
 
-	public Object getObject() {
-		return object;
+	public Object getResult() {
+		return result;
 	}
 
-	public void setObject(Object object) {
-		this.object = object;
+	public void setResult(Object result) {
+		this.result = result;
 	}
 
 	public int getTotal() {
