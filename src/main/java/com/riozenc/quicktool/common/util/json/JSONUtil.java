@@ -13,6 +13,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JSONUtil {
@@ -28,9 +29,21 @@ public class JSONUtil {
 	 * @return
 	 */
 	public static String toJsonString(Object object) {
+		return toJsonString(object, false);
+	}
+
+	public static String toJsonString(Object object, boolean isIgnoreNull) {
 		try {
-			return objectMapper.writeValueAsString(object);
-		} catch (IOException e) {
+			if (isIgnoreNull) {
+				ObjectMapper objectMapper = new ObjectMapper();
+				// 配置mapper忽略空属性
+				objectMapper.setSerializationInclusion(Include.NON_EMPTY);
+				return objectMapper.writeValueAsString(object);
+			} else {
+				return objectMapper.writeValueAsString(object);
+			}
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
 			System.err.println("write to json string error:" + object);
 			return null;
 		}
@@ -110,7 +123,7 @@ public class JSONUtil {
 	 * @param response
 	 * @throws IOException
 	 */
-	public static String writeErrorMsg(String msg)  {
+	public static String writeErrorMsg(String msg) {
 		return "{\"status\":" + FAILED + ",\"msg\":\"" + msg + "\"}";
 	}
 
