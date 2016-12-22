@@ -127,12 +127,12 @@ public class DbFactory {
 			}
 
 			factoryBean.setDataSource(pooledDataSource);
-			factoryBean.setTypeAliasesPackage("crm");
+			factoryBean.setTypeAliasesPackage(Global.getConfig("namespace"));
 			factoryBean.setTypeAliasesSuperType(MybatisEntity.class);
 
 			try {
 				factoryBean.setMapperLocations(
-						new PathMatchingResourcePatternResolver().getResources("classpath:/crm/webapp/**/*.xml"));
+						new PathMatchingResourcePatternResolver().getResources("classpath:/"+Global.getConfig("namespace")+"/webapp/**/*.xml"));
 				factoryBean.setConfigLocation(
 						new PathMatchingResourcePatternResolver().getResource("classpath:mybatis-config.xml"));
 
