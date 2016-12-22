@@ -39,6 +39,9 @@ public class ClassDAOXmlUtil {
 		Field[] fields = clazz.getDeclaredFields();
 
 		for (Field field : fields) {
+			if (field.getAnnotation(TablePrimaryKey.class) != null) {
+				continue;
+			}
 			sb.append("<if test=\"" + field.getName() + " !=null\">").append("\n");
 			sb.append(StringUtils.allToUpper(field.getName()) + " = #{" + field.getName() + "},").append("\n");
 			sb.append("</if>").append("\n");
