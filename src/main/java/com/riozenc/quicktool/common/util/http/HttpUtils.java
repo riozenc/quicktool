@@ -19,9 +19,11 @@ public class HttpUtils {
 		String remoteAddr = request.getHeader("X-Real-IP");
 		if (!StringUtils.isBlank(remoteAddr)) {
 			remoteAddr = request.getHeader("X-Forwarded-For");
-		} else if (!StringUtils.isBlank(remoteAddr)) {
+		}
+		if (!StringUtils.isBlank(remoteAddr)) {
 			remoteAddr = request.getHeader("Proxy-Client-IP");
-		} else if (!StringUtils.isBlank(remoteAddr)) {
+		}
+		if (!StringUtils.isBlank(remoteAddr)) {
 			remoteAddr = request.getHeader("WL-Proxy-Client-IP");
 		}
 		return remoteAddr != null ? remoteAddr : request.getRemoteAddr();
