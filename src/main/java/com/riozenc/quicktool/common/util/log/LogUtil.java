@@ -63,15 +63,12 @@ public class LogUtil {
 		public static Logger getLogger(String name) {
 			switch (OUT_TYPE) {
 			case FILE:
-
 				return LogManager.getLogger(name);
 			case SYSTEM:
 				return LogManager.getLogger("Console");
 			}
 			return null;
-
 		}
-
 	}
 
 }
