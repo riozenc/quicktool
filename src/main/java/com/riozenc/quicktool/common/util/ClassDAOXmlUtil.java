@@ -7,6 +7,7 @@ package com.riozenc.quicktool.common.util;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -148,7 +149,11 @@ public class ClassDAOXmlUtil {
 			sb.append(buildDelete(clazz, tableName));
 
 			sb.append("</mapper>");
-
+			
+			if(!FileUtil.isDirectory(new File(docPath))){
+				throw new FileNotFoundException(docPath+"不存在,请确认路径.");
+			}
+			
 			File file = FileUtil.createFile(docPath, fileName + ".xml");
 
 			bufferedWriter = new BufferedWriter(new FileWriter(file));
