@@ -188,6 +188,9 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 				if (entry.getValue().getConnection().getAutoCommit()) {
 					throw new Exception(methodName + "方法存在事务自动提交...");
 				}
+//				SqlSession s = entry.getValue();
+//				s.getClass();
+				
 //				entry.getValue().commit();
 				entry.getValue().getConnection().commit();
 			}

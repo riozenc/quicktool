@@ -53,7 +53,7 @@ public class DbFactory {
 	 * 
 	 * @return
 	 */
-	protected static SqlSessionFactory getSqlSessionFactory() {
+	public static SqlSessionFactory getSqlSessionFactory() {
 		if (FLAG) {
 			return sqlSessionFactory;
 		} else {
