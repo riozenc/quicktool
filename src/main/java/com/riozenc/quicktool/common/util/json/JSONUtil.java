@@ -8,6 +8,8 @@
 package com.riozenc.quicktool.common.util.json;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -21,6 +23,10 @@ public class JSONUtil {
 	private static ObjectMapper objectMapper = new ObjectMapper();
 	private static final int SUCCESS = 0;
 	private static final int FAILED = 1;
+
+	static {
+		objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+	}
 
 	/**
 	 * 对象输出json
@@ -38,6 +44,7 @@ public class JSONUtil {
 				ObjectMapper objectMapper = new ObjectMapper();
 				// 配置mapper忽略空属性
 				objectMapper.setSerializationInclusion(Include.NON_EMPTY);
+
 				return objectMapper.writeValueAsString(object);
 			} else {
 				return objectMapper.writeValueAsString(object);
