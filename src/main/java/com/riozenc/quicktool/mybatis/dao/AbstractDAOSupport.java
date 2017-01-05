@@ -19,20 +19,12 @@ public abstract class AbstractDAOSupport {
 	private boolean isProxy = false;
 	private boolean autoCommit = false;
 	private SqlSession sqlSession = null;
+	private String dbName = null;
 	private String NAMESPACE = null;
 
 	public AbstractDAOSupport() {
 
 	}
-
-	// public AbstractDAOSupport(ExecutorType executorType) {
-	// this.executorType = executorType;
-	// }
-	//
-	// public AbstractDAOSupport(ExecutorType executorType, boolean isProxy) {
-	// this.executorType = executorType;
-	// this.isProxy = isProxy;
-	// }
 
 	protected PersistanceManager getPersistanceManager() {
 		return getPersistanceManager(this.executorType, this.autoCommit, this.isProxy);
@@ -49,7 +41,7 @@ public abstract class AbstractDAOSupport {
 
 	protected PersistanceManager getPersistanceManager(ExecutorType executorType, boolean autoCommit, boolean isProxy) {
 
-		return getPersistanceManager("", executorType, autoCommit, isProxy);
+		return getPersistanceManager(dbName, executorType, autoCommit, isProxy);
 	}
 
 	protected PersistanceManager getPersistanceManager(String dbName, ExecutorType executorType, boolean autoCommit,
@@ -57,7 +49,7 @@ public abstract class AbstractDAOSupport {
 
 		System.out.println(Thread.currentThread().getStackTrace()[3].getMethodName());
 		Long l = System.currentTimeMillis();
-		sqlSession = SqlSessionManager.getSession(executorType);
+		sqlSession = SqlSessionManager.getSession(dbName, executorType);
 		LogUtil.getLogger(LOG_TYPE.DB).info("获取SqlSession用时:" + (System.currentTimeMillis() - l));
 
 		if (isProxy) {
@@ -77,6 +69,14 @@ public abstract class AbstractDAOSupport {
 
 	public SqlSession getSqlSession() {
 		return this.sqlSession;
+	}
+
+	protected String getDbName() {
+		return this.dbName;
+	}
+
+	protected ExecutorType getExecutorType() {
+		return executorType;
 	}
 
 }

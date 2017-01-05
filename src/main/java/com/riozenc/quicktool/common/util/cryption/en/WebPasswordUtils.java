@@ -10,6 +10,8 @@ import java.security.SecureRandom;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.Validate;
 
+import com.riozenc.quicktool.common.util.StringUtils;
+
 public class WebPasswordUtils {
 	private static SecureRandom random = new SecureRandom();
 	private static final int Iterations = 1024;
@@ -18,6 +20,8 @@ public class WebPasswordUtils {
 	private static final String ALGORITHM_NAME = "SHA-512";
 
 	public static String encodePassword(String password) {
+		if (StringUtils.isBlank(password))
+			return null;
 		try {
 			byte[] salt = generateSalt(8);
 			byte[] hash = HashUtils.getHash(ALGORITHM_NAME, password.getBytes(), salt, Iterations);

@@ -17,6 +17,7 @@ import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import com.riozenc.quicktool.annotation.TransactionDAO;
 import com.riozenc.quicktool.common.util.ClassUtils;
 import com.riozenc.quicktool.common.util.StringUtils;
+import com.riozenc.quicktool.common.util.annotation.AnnotationUtil;
 import com.riozenc.quicktool.common.util.reflect.ReflectUtil;
 import com.riozenc.quicktool.mybatis.dao.AbstractTransactionDAOSupport;
 import com.riozenc.quicktool.springmvc.transaction.proxy.TransactionServiceProxyFactory2;
@@ -81,21 +82,30 @@ public class TransactionServiceFactoryBean<T> implements FactoryBean<T> {
 
 	private AbstractTransactionDAOSupport processTransactionDAO(Field dao) throws Exception {
 		if (null != dao.getAnnotation(TransactionDAO.class)) {
-			
-			BeanDefinitionHolder beanDefinitionHolder = definitionHolderMap.get(StringUtils.decapitalize(dao.getType().getSimpleName()));
+
+			BeanDefinitionHolder beanDefinitionHolder = definitionHolderMap
+					.get(StringUtils.decapitalize(dao.getType().getSimpleName()));
 			if (beanDefinitionHolder == null) {
 				throw new Exception(dao.getName() + " is not found @TransactionDAO!");
 			}
-			AbstractTransactionDAOSupport abstractDAOSupport = (AbstractTransactionDAOSupport) BeanUtils.instantiate(dao.getType());
+			AbstractTransactionDAOSupport abstractDAOSupport = (AbstractTransactionDAOSupport) BeanUtils
+					.instantiate(dao.getType());
 			Field sqlSessionField = ClassUtils.getField(dao.getType(), SqlSession.class);
 			if (sqlSessionField == null) {
 				throw new Exception(dao.getName() + " is not found AbstractTransactionDAOSupport support!");
 			}
+
+			String dbName = (String) AnnotationUtil.getAnnotationValue(dao, TransactionDAO.class);
+			if (dbName.length() < 1) {
+				dbName = (String) AnnotationUtil.getAnnotationValue(dao.getType(), TransactionDAO.class);
+			}
+			ReflectUtil.setFieldValue(abstractDAOSupport, "dbName", dbName);
+
 			return abstractDAOSupport;
 		}
 		return null;
 	}
-	
+
 	public static void main(String[] args) {
 		String s = "UserDAO";
 		System.out.println(StringUtils.decapitalize(s));

@@ -49,11 +49,21 @@ public class SqlSessionManager {
 		return sqlSessionFactory.openSession(executorType, false);
 	}
 
+	public static SqlSession getSession(ExecutorType executorType, boolean autoCommit) {
+		if (null == sqlSessionFactory) {
+			synchronized (b) {
+				sqlSessionFactory = DbFactory.getSqlSessionFactory();
+			}
+		}
+		// 不自动提交
+		return sqlSessionFactory.openSession(executorType, autoCommit);
+	}
+
 	public static SqlSession getSession(String dbName, ExecutorType executorType) {
 
 		synchronized (b) {
 			try {
-				return DbFactory.getSqlSessionFactory(dbName).openSession(false);
+				return DbFactory.getSqlSessionFactory(dbName).openSession(executorType, false);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

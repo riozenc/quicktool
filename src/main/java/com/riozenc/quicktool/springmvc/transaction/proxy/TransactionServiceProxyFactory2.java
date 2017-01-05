@@ -10,6 +10,7 @@ import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.ibatis.session.SqlSession;
@@ -67,7 +68,8 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 	@Override
 	public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
 		// TODO Auto-generated method stub
-		buildDAO();
+
+		// buildDAO();
 		String methodName = method.getName();
 
 		if (methodName.startsWith("get") || methodName.startsWith("find")) {// 查询方法无事务
@@ -76,18 +78,10 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 		}
 		try {
 			Object rev = method.invoke(targetObject, args);
-			for (Entry<Integer, SqlSession> entry : sqlSessionMap.entrySet()) {
-				if (entry.getValue().getConnection().getAutoCommit()) {
-					throw new Exception(methodName + "方法存在事务自动提交...");
-				}
-				entry.getValue().getConnection().commit();
-			}
+			commit(sqlSessionMap, methodName);
 			return rev;
 		} catch (Exception e) {
-			for (Entry<Integer, SqlSession> entry : sqlSessionMap.entrySet()) {
-				entry.getValue().getConnection().rollback();
-			}
-
+			rollback(sqlSessionMap);
 			LogUtil.getLogger(LOG_TYPE.ERROR).error(ExceptionLogUtil.log(e));
 			return null;
 		} finally {
@@ -98,6 +92,26 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 		}
 	}
 
+	/**
+	 * 回收service中dao的sqlSession
+	 */
+	private void recovery() {
+
+		// targetObject;
+		Field[] fields = this.clazz.getDeclaredFields();
+		for (Field dao : fields) {
+			AbstractDAOSupport abstractDAOSupport = (AbstractDAOSupport) ReflectUtil.getFieldValue(targetObject,
+					dao.getName());
+
+			close(sqlSessionMap.put(abstractDAOSupport.hashCode(), abstractDAOSupport.getSqlSession()));
+		}
+	}
+
+	/**
+	 * 注入sqlSession
+	 * 
+	 * @throws SQLException
+	 */
 	private void buildDAO() throws SQLException {
 		Field[] fields = this.clazz.getDeclaredFields();
 		for (Field dao : fields) {
@@ -109,6 +123,14 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 		}
 	}
 
+	/**
+	 * 替换sqlSession
+	 * 
+	 * @param abstractDAOSupport
+	 * @param dao
+	 * @return
+	 * @throws SQLException
+	 */
 	private SqlSession replaceSqlSession(AbstractDAOSupport abstractDAOSupport, Field dao) throws SQLException {
 		String dbName = (String) AnnotationUtil.getAnnotationValue(dao, TransactionDAO.class);
 		if (dbName.length() < 1) {
@@ -126,23 +148,59 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 		return oldSqlSession;
 	}
 
+	/**
+	 * 校验sqlSession有效性
+	 * 
+	 * @param sqlSession
+	 * @return
+	 */
 	private boolean isValidSqlSession(SqlSession sqlSession) {
 		try {
-			if (sqlSession ==null || sqlSession.getConnection().isClosed()) {
+			if (sqlSession == null || sqlSession.getConnection().isClosed()) {
 				return false;
 			} else {
 				return true;
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
 			return false;
 		}
+	}
+
+	private void close(Map<Integer, SqlSession> sqlSessionMap) {
+		for (Entry<Integer, SqlSession> entry : sqlSessionMap.entrySet()) {
+			close(entry.getValue());
+		}
+		sqlSessionMap.clear();
 	}
 
 	private void close(SqlSession sqlSession) {
 		if (sqlSession != null) {
 			sqlSession.close();
+		}
+	}
+
+	private void commit(Map<Integer, SqlSession> sqlSessionMap, String methodName) throws SQLException, Exception {
+		recovery();// 回收sqlSession
+
+		for (Entry<Integer, SqlSession> entry : sqlSessionMap.entrySet()) {
+			if(entry.getValue()!=null){
+				if (entry.getValue().getConnection().getAutoCommit()) {
+					throw new Exception(methodName + "方法存在事务自动提交...");
+				}
+//				entry.getValue().commit();
+				entry.getValue().getConnection().commit();
+			}
+		}
+	}
+
+	private void rollback(Map<Integer, SqlSession> sqlSessionMap) throws SQLException {
+		recovery();// 回收sqlSession
+		for (Entry<Integer, SqlSession> entry : sqlSessionMap.entrySet()) {
+			if(entry.getValue()!=null){				
+//				entry.getValue().rollback();
+				entry.getValue().getConnection().rollback();
+			}
 		}
 	}
 }

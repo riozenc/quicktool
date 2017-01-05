@@ -10,11 +10,7 @@ public class JSONResult {
 	private int total = 0;// 数量
 	private Object result;// 对象
 
-	public JSONResult(int status, int total, Object result) {
-		this.total = total;
-		this.status = status;
-		this.result = result;
-	}
+	
 
 	public int getStatus() {
 		return status;

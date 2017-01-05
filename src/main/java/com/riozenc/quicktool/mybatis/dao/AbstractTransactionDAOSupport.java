@@ -6,7 +6,6 @@
 package com.riozenc.quicktool.mybatis.dao;
 
 import com.riozenc.quicktool.mybatis.db.PersistanceManager;
-import com.riozenc.quicktool.proxy.DAOProxyFactory;
 
 public abstract class AbstractTransactionDAOSupport extends AbstractDAOSupport {
 
@@ -19,12 +18,7 @@ public abstract class AbstractTransactionDAOSupport extends AbstractDAOSupport {
 	}
 
 	protected PersistanceManager getPersistanceManager(boolean autoCommit, boolean isProxy) {
-		if (isProxy) {
-			return (PersistanceManager) DAOProxyFactory.getInstance()
-					.createProxy(new PersistanceManager(getSqlSession(), autoCommit));
-		} else {
-			return new PersistanceManager(getSqlSession(), autoCommit);
-		}
+		return getPersistanceManager(getDbName(), getExecutorType(), autoCommit, isProxy);
 	}
 
 }

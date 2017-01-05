@@ -50,22 +50,6 @@ public class JSONUtil {
 	}
 
 	/**
-	 * 生成object的json字符串,一个对象
-	 * 
-	 * @param object
-	 * @return
-	 */
-	public static String getJsonResult(Object object) {
-
-		if (object instanceof List) {
-			List<?> list = (List<?>) object;
-			return toJsonString(new JSONResult(0, list.size(), list));
-		}
-
-		return toJsonString(new JSONResult(0, 1, object));
-	}
-
-	/**
 	 * 输出成功信息
 	 * 
 	 * @param msg
