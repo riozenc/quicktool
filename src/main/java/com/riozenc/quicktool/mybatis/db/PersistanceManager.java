@@ -38,17 +38,18 @@ public class PersistanceManager {
 
 	public PersistanceManager(SqlSession session, boolean autoCommit) {
 		this.session = session;
-
-		// 自动提交
-		try {
-			if (!autoCommit) {
-				//不采用mybatis和spring管理，所以要深度关闭自动提交
-				this.session.getConnection().setAutoCommit(autoCommit);
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			throw new RuntimeException(e.getMessage());
-		}
+		//已经设置默认不自动提交
+		
+//		// 自动提交
+//		try {
+//			if (!autoCommit) {
+//				//不采用mybatis和spring管理，所以要深度关闭自动提交
+//				this.session.getConnection().setAutoCommit(autoCommit);
+//			}
+//		} catch (SQLException e) {
+//			// TODO Auto-generated catch block
+//			throw new RuntimeException(e.getMessage());
+//		}
 	}
 
 	public PersistanceManager() {

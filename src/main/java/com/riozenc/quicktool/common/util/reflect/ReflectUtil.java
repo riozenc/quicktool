@@ -106,6 +106,9 @@ public class ReflectUtil {
 		for (Class<?> superClass = obj.getClass(); superClass != Object.class; superClass = superClass
 				.getSuperclass()) {
 			try {
+				
+				superClass.getMethods();
+				
 				Method method = superClass.getDeclaredMethod(MethodGen.generateMethodName(methodType, fieldName),
 						parameterTypes);
 				makeAccessible(method);

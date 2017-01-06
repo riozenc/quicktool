@@ -176,7 +176,10 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 
 	private void close(SqlSession sqlSession) {
 		if (sqlSession != null) {
+
 			sqlSession.close();
+
+			System.out.println(isValidSqlSession(sqlSession));
 		}
 	}
 
@@ -184,15 +187,11 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 		recovery();// 回收sqlSession
 
 		for (Entry<Integer, SqlSession> entry : sqlSessionMap.entrySet()) {
-			if(entry.getValue()!=null){
+			if (entry.getValue() != null) {
 				if (entry.getValue().getConnection().getAutoCommit()) {
 					throw new Exception(methodName + "方法存在事务自动提交...");
 				}
-//				SqlSession s = entry.getValue();
-//				s.getClass();
-				
-//				entry.getValue().commit();
-				entry.getValue().getConnection().commit();
+				entry.getValue().commit();// connection autocommit=true时 失效
 			}
 		}
 	}
@@ -200,9 +199,9 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 	private void rollback(Map<Integer, SqlSession> sqlSessionMap) throws SQLException {
 		recovery();// 回收sqlSession
 		for (Entry<Integer, SqlSession> entry : sqlSessionMap.entrySet()) {
-			if(entry.getValue()!=null){				
-//				entry.getValue().rollback();
-				entry.getValue().getConnection().rollback();
+			if (entry.getValue() != null) {
+				entry.getValue().rollback();// connection autocommit=true时 失效
+				// entry.getValue().getConnection().rollback();
 			}
 		}
 	}

@@ -18,6 +18,8 @@ import org.apache.ibatis.reflection.ReflectionException;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
@@ -31,6 +33,8 @@ import com.riozenc.quicktool.mybatis.MybatisEntity;
 import com.riozenc.quicktool.springmvc.context.SpringContextHolder;
 
 public class DbFactory {
+
+	private static final Logger LOGGER = LogManager.getLogger(DbFactory.class);
 	private static final String DB = "db";
 
 	private static final String resource = "mybatis-config.xml";
@@ -113,6 +117,10 @@ public class DbFactory {
 			SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
 			PooledDataSource pooledDataSource = new PooledDataSource();
 
+			if (Global.getConfig("autoCommit").equals("false")) {
+				pooledDataSource.setDefaultAutoCommit(false);// 设置连接默认不自动提交
+			}
+
 			for (Entry<String, String> entry : Global.getConfigs(temp).entrySet()) {
 				try {
 
@@ -121,8 +129,16 @@ public class DbFactory {
 					ReflectUtil.setValue(pooledDataSource, getParam(entry.getKey()), entry.getValue());
 
 				} catch (Exception e) {
-					e.initCause(new ReflectionException(getParam(entry.getKey()) + "不是正确的属性..."));
-					System.out.println(getParam(entry.getKey()) + "不是正确的属性...");
+					LOGGER.info(getParam(entry.getKey()) + "属性存在问题,无该属性或对应set/get方法存在异常...尝试强制赋值.");
+					e.initCause(new ReflectionException(
+							getParam(entry.getKey()) + "属性存在问题,无该属性或对应set/get方法存在异常...尝试强制赋值."));
+					// 强制赋值
+					try {
+						ReflectUtil.setFieldValue(pooledDataSource, getParam(entry.getKey()), entry.getValue());
+					} catch (Exception e1) {
+						LOGGER.info(getParam(entry.getKey()) + "不是正确的属性...强制赋值失败");
+						e1.initCause(new ReflectionException(getParam(entry.getKey()) + "不是正确的属性...强制赋值失败"));
+					}
 				}
 			}
 
@@ -131,8 +147,8 @@ public class DbFactory {
 			factoryBean.setTypeAliasesSuperType(MybatisEntity.class);
 
 			try {
-				factoryBean.setMapperLocations(
-						new PathMatchingResourcePatternResolver().getResources("classpath:/"+Global.getConfig("namespace")+"/webapp/**/*.xml"));
+				factoryBean.setMapperLocations(new PathMatchingResourcePatternResolver()
+						.getResources("classpath:/" + Global.getConfig("namespace") + "/webapp/**/*.xml"));
 				factoryBean.setConfigLocation(
 						new PathMatchingResourcePatternResolver().getResource("classpath:mybatis-config.xml"));
 
