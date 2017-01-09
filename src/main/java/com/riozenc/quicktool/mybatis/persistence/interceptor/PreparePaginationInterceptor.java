@@ -14,7 +14,7 @@ import org.apache.ibatis.plugin.Plugin;
 import org.apache.ibatis.plugin.Signature;
 
 import com.riozenc.quicktool.common.util.reflect.ReflectUtil;
-import com.riozenc.quicktool.mybatis.page.Page;
+import com.riozenc.quicktool.mybatis.persistence.Page;
 
 import java.sql.Connection;
 import java.util.Properties;
@@ -58,7 +58,7 @@ public class PreparePaginationInterceptor extends BaseInterceptor {
 				final int count = SQLHelper.getCount(sql, connection, mappedStatement, parameterObject, boundSql, logger);
 				Page<Object> page = null;
 				page = convertParameter(parameterObject, page);
-				page.setCount(count);
+				page.setTotalRow(count);
 				String pagingSql = SQLHelper.generatePageSql(sql, page, DIALECT);
 				if (logger.isDebugEnabled()) {
 					logger.debug("PAGE SQL:" + pagingSql);

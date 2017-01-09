@@ -117,7 +117,7 @@ public class DbFactory {
 			SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
 			PooledDataSource pooledDataSource = new PooledDataSource();
 
-			if (Global.getConfig("autoCommit").equals("false")) {
+			if (Global.getConfig("db.autoCommit").equals("false")) {
 				pooledDataSource.setDefaultAutoCommit(false);// 设置连接默认不自动提交
 			}
 

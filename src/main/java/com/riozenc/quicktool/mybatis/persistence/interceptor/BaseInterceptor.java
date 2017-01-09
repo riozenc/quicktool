@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
 import com.riozenc.quicktool.common.util.log.LogUtil;
 import com.riozenc.quicktool.common.util.reflect.ReflectUtil;
 import com.riozenc.quicktool.config.Global;
-import com.riozenc.quicktool.mybatis.page.Page;
+import com.riozenc.quicktool.mybatis.persistence.Page;
 import com.riozenc.quicktool.mybatis.persistence.dialect.Dialect;
 import com.riozenc.quicktool.mybatis.persistence.dialect.db.DB2Dialect;
 import com.riozenc.quicktool.mybatis.persistence.dialect.db.DerbyDialect;
