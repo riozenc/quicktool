@@ -25,6 +25,7 @@ import com.riozenc.quicktool.config.Global;
  * @version 2013-7-2
  * @param <T>
  */
+@Deprecated
 public class Page<T> {
 
 	private int pageNo = 1; // 当前页码
