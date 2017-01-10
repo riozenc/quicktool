@@ -33,6 +33,7 @@ import com.riozenc.quicktool.mybatis.persistence.Page;
 public class PaginationInterceptor extends BaseInterceptor {
 
 	private static final long serialVersionUID = 1L;
+	private static Class[] params = new Class[] {};
 
 	@Override
 	public Object intercept(Invocation invocation) throws Throwable {
@@ -47,7 +48,13 @@ public class PaginationInterceptor extends BaseInterceptor {
 
 		Class<?> clazz = Class.forName(className);
 
-		Method method = clazz.getDeclaredMethod(methodName, parameter.getClass());
+		Method method = null;
+		if (parameter == null) {
+
+			method = clazz.getDeclaredMethod(methodName, params);
+		} else {
+			method = clazz.getDeclaredMethod(methodName, parameter.getClass());
+		}
 
 		if (mappedStatement.getId().lastIndexOf("ByWhere") > 0) {
 
