@@ -1,10 +1,14 @@
 package com.riozenc.quicktool.mybatis.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.riozenc.quicktool.config.Global;
 
 public class Page<T> {
+	@JsonIgnore
 	private int totalRow;// 总条数
+	@JsonIgnore
 	private int pageCurrent = 1; // 当前页
+	@JsonIgnore
 	private int pageSize= Integer.valueOf(Global.getConfig("page.pageSize")); // 页面大小，设置为“-1”表示不进行分页（分页无效）
 
 	public int getTotalRow() {
