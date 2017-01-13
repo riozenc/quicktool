@@ -13,9 +13,19 @@ import java.util.Map;
 import com.riozenc.quicktool.common.util.file.filter.ClassFileFilter;
 import com.riozenc.quicktool.common.util.log.LogUtil;
 import com.riozenc.quicktool.common.util.log.LogUtil.LOG_TYPE;
+import com.riozenc.quicktool.config.Global;
 import com.riozenc.quicktool.exception.BadFileException;
 
 public class FileUtil {
+
+	public static void upload(File file, String fileName) {
+		String docPath = Global.getConfig("file.doc.path");
+
+		if (isDirectory(new File(docPath))) {
+			// 是文件夹
+
+		}
+	}
 
 	public static File createFile(String docPath, String fileName) {
 		File doc = new File(docPath);
