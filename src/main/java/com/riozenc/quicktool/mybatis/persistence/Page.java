@@ -38,6 +38,7 @@ public class Page<T> {
 	/**
 	 * 获取 Hibernate FirstResult
 	 */
+	@JsonIgnore
 	public int getFirstResult() {
 		int firstResult = (getPageCurrent() - 1) * getPageSize();
 		if (firstResult >= getTotalRow()) {
@@ -49,6 +50,7 @@ public class Page<T> {
 	/**
 	 * 获取 Hibernate MaxResults
 	 */
+	@JsonIgnore
 	public int getMaxResults() {
 		return getPageSize();
 	}
