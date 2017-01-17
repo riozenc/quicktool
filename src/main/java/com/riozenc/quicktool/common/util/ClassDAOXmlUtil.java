@@ -89,6 +89,15 @@ public class ClassDAOXmlUtil {
 		return list;
 	}
 
+	private static String dynamicSqlFormat(String fieldName, boolean isAnd, boolean isIf) {
+		if (isIf) {
+			return dynamicSqlFormat(fieldName, isAnd);
+		} else {
+			//用于生成主键，update和delete必须有条件
+			return (isAnd ? " and " : "") + StringUtils.allToUpper(fieldName) + " = #{" + fieldName + "}" + (isAnd ? "" : ",") + "\n";
+		}
+	}
+
 	private static String dynamicSqlFormat(String fieldName, boolean isAnd) {
 		return "<if test=\"" + fieldName + " !=null\"> \n" + (isAnd ? " and " : "") + StringUtils.allToUpper(fieldName)
 				+ " = #{" + fieldName + "}" + (isAnd ? "" : ",") + "\n" + "</if>";
@@ -149,11 +158,11 @@ public class ClassDAOXmlUtil {
 			sb.append(buildDelete(clazz, tableName));
 
 			sb.append("</mapper>");
-			
-			if(!FileUtil.isDirectory(new File(docPath))){
-				throw new FileNotFoundException(docPath+"不存在,请确认路径.");
+
+			if (!FileUtil.isDirectory(new File(docPath))) {
+				throw new FileNotFoundException(docPath + "不存在,请确认路径.");
 			}
-			
+
 			File file = FileUtil.createFile(docPath, fileName + ".xml");
 
 			bufferedWriter = new BufferedWriter(new FileWriter(file));
@@ -249,7 +258,7 @@ public class ClassDAOXmlUtil {
 			sb.append("<where>");
 			sb.append("\n");
 			for (String fieldName : getPrimaryKeys(clazz)) {
-				sb.append(dynamicSqlFormat(fieldName, true));
+				sb.append(dynamicSqlFormat(fieldName, true,false));
 				sb.append("\n");
 			}
 			sb.append("</where>");
@@ -275,7 +284,7 @@ public class ClassDAOXmlUtil {
 			sb.append("<where>");
 			sb.append("\n");
 			for (String fieldName : getPrimaryKeys(clazz)) {
-				sb.append(dynamicSqlFormat(fieldName, true));
+				sb.append(dynamicSqlFormat(fieldName, true,false));
 				sb.append("\n");
 			}
 			sb.append("</where>");
