@@ -192,7 +192,7 @@ public class ClassDAOXmlUtil {
 			sb.append("<where>");
 			sb.append("\n");
 			for (String fieldName : getPrimaryKeys(clazz)) {
-				sb.append(dynamicSqlFormat(fieldName, true));
+				sb.append(dynamicSqlFormat(fieldName, true,false));
 				sb.append("\n");
 			}
 			sb.append("</where>");
