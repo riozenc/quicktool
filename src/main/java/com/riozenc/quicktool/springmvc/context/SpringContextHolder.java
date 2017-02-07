@@ -15,6 +15,8 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import com.riozenc.quicktool.common.util.log.LogUtil;
+import com.riozenc.quicktool.common.util.log.LogUtil.LOG_TYPE;
 import com.riozenc.quicktool.springmvc.context.listener.SpringContextListener;
 
 public class SpringContextHolder implements ApplicationContextAware, DisposableBean {
@@ -28,7 +30,7 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
 		// TODO Auto-generated method stub
 		if (SpringContextHolder.applicationContext == null) {
 			SpringContextHolder.applicationContext = applicationContext;
-			System.out.println("完成applicationContext赋值,SpringContextHolder功能启用.");
+			LogUtil.getLogger(LOG_TYPE.OTHER).info("完成applicationContext赋值,SpringContextHolder功能启用.");;
 		}
 		for (SpringContextListener listener : list) {
 			listener.run();
