@@ -18,7 +18,7 @@ import org.springframework.context.ApplicationContextAware;
 import com.riozenc.quicktool.springmvc.context.listener.SpringContextListener;
 
 public class SpringContextHolder implements ApplicationContextAware, DisposableBean {
-
+	
 	private static ApplicationContext applicationContext = null;
 
 	private static List<SpringContextListener> list = new ArrayList<>();
@@ -28,7 +28,7 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
 		// TODO Auto-generated method stub
 		if (SpringContextHolder.applicationContext == null) {
 			SpringContextHolder.applicationContext = applicationContext;
-			System.out.println("完成applicationContext赋值");
+			System.out.println("完成applicationContext赋值,SpringContextHolder功能启用.");
 		}
 		for (SpringContextListener listener : list) {
 			listener.run();
