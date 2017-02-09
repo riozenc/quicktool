@@ -37,6 +37,16 @@ public class JSONUtil {
 		return toJsonString(object, false);
 	}
 
+	public static <T> T readValue(String json, Class<T> clazz) {
+		try {
+			return objectMapper.readValue(json, clazz);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 	public static String toJsonString(Object object, boolean isIgnoreNull) {
 		try {
 			if (isIgnoreNull) {
