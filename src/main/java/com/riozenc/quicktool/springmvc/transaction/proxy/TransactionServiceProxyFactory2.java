@@ -77,6 +77,7 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 			return rev;
 		}
 		try {
+			method.setAccessible(true);//垃圾回收时，无法调用protected方法
 			Object rev = method.invoke(targetObject, args);
 			commit(sqlSessionMap, methodName);
 			return rev;
