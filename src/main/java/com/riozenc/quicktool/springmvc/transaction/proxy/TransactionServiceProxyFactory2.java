@@ -72,12 +72,13 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 		// buildDAO();
 		String methodName = method.getName();
 
-		if (methodName.startsWith("get") || methodName.startsWith("find")) {// 查询方法无事务
-			Object rev = method.invoke(targetObject, args);
-			return rev;
-		}
 		try {
-			method.setAccessible(true);//垃圾回收时，无法调用protected方法
+			if (methodName.startsWith("get") || methodName.startsWith("find")) {// 查询方法无事务
+				Object rev = method.invoke(targetObject, args);
+				recovery();// 回收sqlSession！注意select也需要回收
+				return rev;
+			}
+			method.setAccessible(true);// 垃圾回收时，无法调用protected方法
 			Object rev = method.invoke(targetObject, args);
 			commit(sqlSessionMap, methodName);
 			return rev;
@@ -97,13 +98,11 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 	 * 回收service中dao的sqlSession
 	 */
 	private void recovery() {
-
 		// targetObject;
 		Field[] fields = this.clazz.getDeclaredFields();
 		for (Field dao : fields) {
 			AbstractDAOSupport abstractDAOSupport = (AbstractDAOSupport) ReflectUtil.getFieldValue(targetObject,
 					dao.getName());
-
 			close(sqlSessionMap.put(abstractDAOSupport.hashCode(), abstractDAOSupport.getSqlSession()));
 		}
 	}
@@ -186,7 +185,6 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 
 	private void commit(Map<Integer, SqlSession> sqlSessionMap, String methodName) throws SQLException, Exception {
 		recovery();// 回收sqlSession
-
 		for (Entry<Integer, SqlSession> entry : sqlSessionMap.entrySet()) {
 			if (entry.getValue() != null) {
 				if (entry.getValue().getConnection().getAutoCommit()) {
