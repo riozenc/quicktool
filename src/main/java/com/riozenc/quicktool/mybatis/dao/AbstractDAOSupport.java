@@ -5,6 +5,11 @@
  */
 package com.riozenc.quicktool.mybatis.dao;
 
+import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 
@@ -19,6 +24,7 @@ public abstract class AbstractDAOSupport {
 	private boolean isProxy = false;
 	private boolean autoCommit = false;
 	private SqlSession sqlSession = null;
+	private Set<SqlSession> sqlSessions = new HashSet<SqlSession>();
 	private String dbName = null;
 	private String NAMESPACE = null;
 
@@ -47,10 +53,23 @@ public abstract class AbstractDAOSupport {
 	protected PersistanceManager getPersistanceManager(String dbName, ExecutorType executorType, boolean autoCommit,
 			boolean isProxy) {
 
-		System.out.println(Thread.currentThread().getStackTrace()[3].getMethodName());
 		Long l = System.currentTimeMillis();
-		sqlSession = SqlSessionManager.getSession(dbName, executorType);
+		if (sqlSession == null) {
+			sqlSession = SqlSessionManager.getSession(dbName, executorType);
+		} else {
+			try {
+				if (sqlSession.getConnection().isClosed()) {
+					sqlSession = SqlSessionManager.getSession(dbName, executorType);
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				sqlSessions.remove(sqlSession);
+				sqlSession = SqlSessionManager.getSession(dbName, executorType);
+			}
+		}
 		LogUtil.getLogger(LOG_TYPE.DB).info("获取SqlSession用时:" + (System.currentTimeMillis() - l));
+		sqlSessions.add(sqlSession);
 
 		if (isProxy) {
 			return (PersistanceManager) DAOProxyFactory.getInstance()
@@ -65,6 +84,11 @@ public abstract class AbstractDAOSupport {
 			NAMESPACE = this.getClass().getName();
 		}
 		return NAMESPACE;
+	}
+
+	
+	public Set<SqlSession> getSqlSessions() {
+		return this.sqlSessions;
 	}
 
 	public SqlSession getSqlSession() {

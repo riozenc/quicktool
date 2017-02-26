@@ -83,6 +83,7 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 			commit(sqlSessionMap, methodName);
 			return rev;
 		} catch (Exception e) {
+			e.printStackTrace();
 			rollback(sqlSessionMap);
 			LogUtil.getLogger(LOG_TYPE.ERROR).error(ExceptionLogUtil.log(e));
 			return null;
@@ -91,6 +92,7 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 			for (Entry<Integer, SqlSession> entry : sqlSessionMap.entrySet()) {
 				close(entry.getValue());
 			}
+			sqlSessionMap.clear();;
 		}
 	}
 
@@ -103,7 +105,13 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 		for (Field dao : fields) {
 			AbstractDAOSupport abstractDAOSupport = (AbstractDAOSupport) ReflectUtil.getFieldValue(targetObject,
 					dao.getName());
-			close(sqlSessionMap.put(abstractDAOSupport.hashCode(), abstractDAOSupport.getSqlSession()));
+			
+			
+			
+			for (SqlSession sqlSession : abstractDAOSupport.getSqlSessions()) {
+				close(sqlSessionMap.put(sqlSession.hashCode(), sqlSession));
+			}
+			abstractDAOSupport.getSqlSessions().clear();
 		}
 	}
 
@@ -176,10 +184,8 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 
 	private void close(SqlSession sqlSession) {
 		if (sqlSession != null) {
-
 			sqlSession.close();
-
-			System.out.println(isValidSqlSession(sqlSession));
+			sqlSession = null;
 		}
 	}
 
