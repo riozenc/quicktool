@@ -34,7 +34,7 @@ public class FileUtil {
 			doc.mkdirs();
 		}
 		if (doc.isDirectory()) {
-			file = new File(docPath + "\\" + fileName);
+			file = new File(docPath + File.separator + fileName);
 			try {
 				file.createNewFile();
 			} catch (IOException e) {
