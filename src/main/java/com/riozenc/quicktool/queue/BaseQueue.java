@@ -8,31 +8,47 @@ package com.riozenc.quicktool.queue;
 
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 import com.riozenc.quicktool.queue.manager.QueueManager;
+import com.riozenc.quicktool.queue.processor.BaseProcessor;
 
-public abstract class BaseQueue<T> {
+public abstract class BaseQueue<E> {
+
+	// （阻塞）数据队列
+	protected BlockingQueue<E> blockingQueue;
+	// 处理器
+	protected BaseProcessor baseProcessor;
+	// 有效标志
+	private boolean isValid;
+	// 创建时间
+	private long createTimestamp;
+	// 最后使用时间
+	private long lastUsedTimestamp;
+	// 队列长度
+	private int limit = 1000;
+
+	public abstract void run();
 
 	private Long time = System.currentTimeMillis();
-	private int limit = 1000;
-	private ArrayBlockingQueue<T> queue;
+	private ArrayBlockingQueue<E> queue;
 	private QueueManager queueManager;// 管理
 
-	public Queue<T> geQueue() {
+	public Queue<E> geQueue() {
 		return queue;
 	}
 
 	public BaseQueue(QueueManager queueManager) {
 		System.out.println(Thread.currentThread().getName() + "创建DbQueue");
 		this.queueManager = queueManager;
-		queue = new ArrayBlockingQueue<T>(limit);
+		queue = new ArrayBlockingQueue<E>(limit);
 
 	}
 
 	public BaseQueue(QueueManager queueManager, int limit) {
 		this.limit = limit;
 		this.queueManager = queueManager;
-		queue = new ArrayBlockingQueue<T>(limit);
+		queue = new ArrayBlockingQueue<E>(limit);
 	}
 
 	public int getLimit() {
@@ -65,7 +81,7 @@ public abstract class BaseQueue<T> {
 	 * 
 	 * @param obj
 	 */
-	public void putVO(T t) {
+	public void putVO(E t) {
 		try {
 			queue.put(t);
 			System.out.println("queue...put成功...");
@@ -80,7 +96,7 @@ public abstract class BaseQueue<T> {
 	 * 
 	 * @param obj
 	 */
-	public boolean offerVO(T t) {
+	public boolean offerVO(E t) {
 		return queue.offer(t);
 	}
 
@@ -97,7 +113,7 @@ public abstract class BaseQueue<T> {
 	 * 
 	 * @param t
 	 */
-	public abstract void excute(T t);
+	public abstract void excute(E t);
 
 	public abstract void excuteAll(Queue queue);
 
