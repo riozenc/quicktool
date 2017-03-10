@@ -5,10 +5,9 @@
  */
 package com.riozenc.quicktool.mybatis.dao;
 
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
@@ -23,13 +22,16 @@ public abstract class AbstractDAOSupport {
 	private ExecutorType executorType = ExecutorType.SIMPLE;
 	private boolean isProxy = false;
 	private boolean autoCommit = false;
-	private SqlSession sqlSession = null;
-	private Set<SqlSession> sqlSessions = new HashSet<SqlSession>();
+	// private SqlSession sqlSession = null;
+	// private Set<SqlSession> sqlSessions = new HashSet<SqlSession>();
 	private String dbName = null;
 	private String NAMESPACE = null;
 
-	public AbstractDAOSupport() {
+	private ThreadLocal<Map<String, SqlSession>> localSqlSessionMap = new ThreadLocal<>();
 
+	public AbstractDAOSupport() {
+		System.out.println(Thread.currentThread().getName() + "创建AbstractDAOSupport(" + this + ")" + "["
+				+ this.getClass().getName() + "]");
 	}
 
 	protected PersistanceManager getPersistanceManager() {
@@ -50,26 +52,39 @@ public abstract class AbstractDAOSupport {
 		return getPersistanceManager(dbName, executorType, autoCommit, isProxy);
 	}
 
+	/**
+	 * 
+	 * @param dbName
+	 * @param executorType
+	 * @param autoCommit
+	 *            已经在配置文件中，启动数据库时就关闭了自动提交，该属性已经没用了
+	 * @param isProxy
+	 * @return
+	 */
 	protected PersistanceManager getPersistanceManager(String dbName, ExecutorType executorType, boolean autoCommit,
 			boolean isProxy) {
 
 		Long l = System.currentTimeMillis();
+
+		SqlSession sqlSession = getSqlSessionMap().get(dbName + executorType);
+
 		if (sqlSession == null) {
 			sqlSession = SqlSessionManager.getSession(dbName, executorType);
 		} else {
 			try {
 				if (sqlSession.getConnection().isClosed()) {
+					getSqlSessionMap().remove(sqlSession);
 					sqlSession = SqlSessionManager.getSession(dbName, executorType);
 				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
-				sqlSessions.remove(sqlSession);
+				getSqlSessionMap().remove(sqlSession);
 				sqlSession = SqlSessionManager.getSession(dbName, executorType);
 			}
 		}
-		LogUtil.getLogger(LOG_TYPE.DB).info("["+Thread.currentThread().getName()+"]获取SqlSession用时:" + (System.currentTimeMillis() - l)/1000);
-		sqlSessions.add(sqlSession);
+		LogUtil.getLogger(LOG_TYPE.DB).info(
+				"[" + Thread.currentThread().getName() + "]获取SqlSession用时:" + (System.currentTimeMillis() - l) / 1000);
+		getSqlSessionMap().put(dbName + executorType, sqlSession);
 
 		if (isProxy) {
 			return (PersistanceManager) DAOProxyFactory.getInstance()
@@ -86,13 +101,8 @@ public abstract class AbstractDAOSupport {
 		return NAMESPACE;
 	}
 
-	
-	public Set<SqlSession> getSqlSessions() {
-		return this.sqlSessions;
-	}
-
-	public SqlSession getSqlSession() {
-		return this.sqlSession;
+	public Collection<SqlSession> getSqlSessions() {
+		return getSqlSessionMap().values();
 	}
 
 	protected String getDbName() {
@@ -103,4 +113,10 @@ public abstract class AbstractDAOSupport {
 		return executorType;
 	}
 
+	private Map<String, SqlSession> getSqlSessionMap() {
+		if (localSqlSessionMap.get() == null) {
+			localSqlSessionMap.set(new HashMap<String, SqlSession>());
+		}
+		return localSqlSessionMap.get();
+	}
 }

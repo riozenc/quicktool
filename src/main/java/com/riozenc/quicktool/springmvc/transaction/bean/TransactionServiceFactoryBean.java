@@ -90,10 +90,10 @@ public class TransactionServiceFactoryBean<T> implements FactoryBean<T> {
 			}
 			AbstractTransactionDAOSupport abstractDAOSupport = (AbstractTransactionDAOSupport) BeanUtils
 					.instantiate(dao.getType());
-			Field sqlSessionField = ClassUtils.getField(dao.getType(), SqlSession.class);
-			if (sqlSessionField == null) {
-				throw new Exception(dao.getName() + " is not found AbstractTransactionDAOSupport support!");
-			}
+//			Field sqlSessionField = ClassUtils.getField(dao.getType(), SqlSession.class);
+//			if (sqlSessionField == null) {
+//				throw new Exception(dao.getName() + " is not found AbstractTransactionDAOSupport support!");
+//			}
 
 			String dbName = (String) AnnotationUtil.getAnnotationValue(dao, TransactionDAO.class);
 			if (dbName.length() < 1) {

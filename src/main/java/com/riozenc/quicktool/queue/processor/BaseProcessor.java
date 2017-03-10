@@ -5,6 +5,8 @@
 **/
 package com.riozenc.quicktool.queue.processor;
 
-public class BaseProcessor {
+public interface BaseProcessor<T> {
+
+	public void excute(T t);
 
 }

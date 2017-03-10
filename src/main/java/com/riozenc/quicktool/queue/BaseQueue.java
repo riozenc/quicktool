@@ -6,19 +6,18 @@
  */
 package com.riozenc.quicktool.queue;
 
-import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import com.riozenc.quicktool.queue.manager.QueueManager;
 import com.riozenc.quicktool.queue.processor.BaseProcessor;
 
-public abstract class BaseQueue<E> {
+public abstract class BaseQueue<E> implements Runnable {
 
 	// （阻塞）数据队列
 	protected BlockingQueue<E> blockingQueue;
 	// 处理器
-	protected BaseProcessor baseProcessor;
+	protected BaseProcessor<E> baseProcessor;
 	// 有效标志
 	private boolean isValid;
 	// 创建时间
@@ -28,52 +27,43 @@ public abstract class BaseQueue<E> {
 	// 队列长度
 	private int limit = 1000;
 
-	public abstract void run();
-
-	private Long time = System.currentTimeMillis();
-	private ArrayBlockingQueue<E> queue;
 	private QueueManager queueManager;// 管理
 
-	public Queue<E> geQueue() {
-		return queue;
-	}
+	private int i = 0;
 
 	public BaseQueue(QueueManager queueManager) {
 		System.out.println(Thread.currentThread().getName() + "创建DbQueue");
 		this.queueManager = queueManager;
-		queue = new ArrayBlockingQueue<E>(limit);
-
+		blockingQueue = new ArrayBlockingQueue<E>(limit);
+		baseProcessor = null;
 	}
 
 	public BaseQueue(QueueManager queueManager, int limit) {
+		System.out.println(Thread.currentThread().getName() + "创建DbQueue" + "[" + limit + "]");
 		this.limit = limit;
 		this.queueManager = queueManager;
-		queue = new ArrayBlockingQueue<E>(limit);
+		blockingQueue = new ArrayBlockingQueue<E>(limit);
+		baseProcessor = null;
+	}
+
+	public boolean isValid() {
+		return isValid;
 	}
 
 	public int getLimit() {
 		return limit;
 	}
 
-	/**
-	 * 设置queue长度
-	 * 
-	 * @param limit
-	 */
-	public void setLimit(int limit) {
-		this.limit = limit;
+	public long getLastUsedTimestamp() {
+		return lastUsedTimestamp;
 	}
 
-	public Long getTime() {
-		return time;
-	}
-
-	public void setTime(Long time) {
-		this.time = time;
+	public void setLastUsedTimestamp(long lastUsedTimestamp) {
+		this.lastUsedTimestamp = lastUsedTimestamp;
 	}
 
 	public int getSize() {
-		return queue.size();
+		return blockingQueue.size();
 	}
 
 	/**
@@ -83,7 +73,7 @@ public abstract class BaseQueue<E> {
 	 */
 	public void putVO(E t) {
 		try {
-			queue.put(t);
+			blockingQueue.put(t);
 			System.out.println("queue...put成功...");
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -97,15 +87,16 @@ public abstract class BaseQueue<E> {
 	 * @param obj
 	 */
 	public boolean offerVO(E t) {
-		return queue.offer(t);
+		i++;
+		return blockingQueue.offer(t);
 	}
 
 	public Object getVO() {
-		return queue.poll();
+		return blockingQueue.poll();
 	}
 
 	public Object takeVO() throws InterruptedException {
-		return queue.take();
+		return blockingQueue.take();
 	}
 
 	/**
@@ -113,8 +104,20 @@ public abstract class BaseQueue<E> {
 	 * 
 	 * @param t
 	 */
-	public abstract void excute(E t);
 
-	public abstract void excuteAll(Queue queue);
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		try {
+			baseProcessor.excute(blockingQueue.remove());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return super.toString() + "[" + i + "]";
+	}
 }
