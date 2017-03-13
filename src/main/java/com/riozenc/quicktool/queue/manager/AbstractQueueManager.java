@@ -14,7 +14,7 @@ import com.riozenc.quicktool.queue.BaseQueueElement;
 import com.riozenc.quicktool.queue.IQueueManager;
 
 public abstract class AbstractQueueManager implements IQueueManager {
-	private int queueNumber = 5;// 队列个数
+	private int queueNumber = Runtime.getRuntime().availableProcessors();// 队列个数(cpu个数)
 	private int queueLength = 1000;// 队列长度
 	private LinkedList<BaseQueue<BaseQueueElement>> queueList;
 	private final ExecutorService executor = Executors
@@ -44,9 +44,9 @@ public abstract class AbstractQueueManager implements IQueueManager {
 		this.queueLength = queueLength;
 	}
 
-	protected abstract BaseQueue<BaseQueueElement> offerTask();
+	protected abstract BaseQueue<BaseQueueElement> offerTask();//放置任务
 
-	protected abstract BaseQueue<BaseQueueElement> getQueue();
+	protected abstract BaseQueue<BaseQueueElement> getQueue();//获取队列
 
-	protected abstract void switchQueue();
+	protected abstract void switchQueue();//切换队列
 }

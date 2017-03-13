@@ -10,14 +10,13 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import com.riozenc.quicktool.queue.manager.QueueManager;
-import com.riozenc.quicktool.queue.processor.BaseProcessor;
 
 public abstract class BaseQueue<E> implements Runnable {
 
 	// （阻塞）数据队列
 	protected BlockingQueue<E> blockingQueue;
 	// 处理器
-	protected BaseProcessor<E> baseProcessor;
+	protected IBaseProcessor<E> baseProcessor;
 	// 有效标志
 	private boolean isValid;
 	// 创建时间
