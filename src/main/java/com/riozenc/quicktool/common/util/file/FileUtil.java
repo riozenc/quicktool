@@ -45,7 +45,7 @@ public class FileUtil {
 				throw new Exception("上传失败，数据不合法");
 			}
 		}
-		String suffix = "";
+		String suffix = null;
 		if ("data:image/jpeg;".equalsIgnoreCase(dataPrix)) {// data:image/jpeg;base64,base64编码的jpeg图片数据
 			suffix = ".jpg";
 		} else if ("data:image/x-icon;".equalsIgnoreCase(dataPrix)) {// data:image/x-icon;base64,base64编码的icon图片数据
@@ -57,19 +57,15 @@ public class FileUtil {
 		} else {
 			throw new Exception("上传图片格式不合法");
 		}
-
 		File file = FileUtil.createFile(path, fileName + suffix);
-		
-
 		byte[] bs = Base64Utils.decodeFromString(data);
-
 		try {
 			// 使用apache提供的工具类操作流
 			FileUtils.writeByteArrayToFile(file, bs);
 		} catch (Exception ee) {
 			throw new Exception("上传失败，写入文件失败，" + ee.getMessage());
 		}
-		return  file;
+		return file;
 	}
 
 	public static void upload(File file, String fileName) {
@@ -82,20 +78,30 @@ public class FileUtil {
 	}
 
 	public static File createFile(String docPath, String fileName) {
-		File doc = new File(docPath);
-		File file = null;
-		if (!doc.exists()) {
-			doc.mkdirs();
-		}
-		if (doc.isDirectory()) {
-			file = new File(docPath + File.separator + fileName);
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				LogUtil.getLogger(LOG_TYPE.IO).error(e);
+		File file = new File(docPath + File.separator + fileName);
+		try {
+
+			if (file.exists()) {
+				if (file.isDirectory()) {
+					throw new IOException("File '" + file + "' exists but is a directory");
+				}
+				if (file.canWrite() == false) {
+					throw new IOException("File '" + file + "' cannot be written to");
+				}
+			} else {
+				final File parent = file.getParentFile();
+				if (parent != null) {
+					if (!parent.mkdirs() && !parent.isDirectory()) {
+						throw new IOException("Directory '" + parent + "' could not be created");
+					}
+				}
 			}
+
+			file.createNewFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			LogUtil.getLogger(LOG_TYPE.IO).error(e);
 		}
 		return file;
 	}

@@ -7,6 +7,7 @@ package com.riozenc.quicktool.common.util.cryption.en;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 public class HashUtils {
 	
@@ -32,6 +33,18 @@ public class HashUtils {
 		} catch (NoSuchAlgorithmException e) {
 			String msg = "No native '" + algorithmName + "' MessageDigest instance available on the current JVM.";
 			throw new Exception(msg, e);
+		}
+	}
+	
+	public static void main(String[] args) {
+		try {
+			
+			System.out.println(Base64.getEncoder().encodeToString(HashUtils.getHash("SHA-512", "18660509556".getBytes("utf-8"),null,10)));
+			System.out.println(Base64.getEncoder().encodeToString(HashUtils.getHash("SHA-512", "18660509556".getBytes("utf-8"),null,5)));
+			System.out.println(Base64.getEncoder().encodeToString(HashUtils.getHash("SHA-512", "18660509556".getBytes("utf-8"),null,1)));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }
