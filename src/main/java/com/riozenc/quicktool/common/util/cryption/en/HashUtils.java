@@ -10,7 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 public class HashUtils {
-	
+
 	public static byte[] getHash(String algorithmName, byte[] bytes, byte[] salt, int hashIterations) throws Exception {
 		MessageDigest digest = getDigest(algorithmName);
 		if (salt != null) {
@@ -35,16 +35,5 @@ public class HashUtils {
 			throw new Exception(msg, e);
 		}
 	}
-	
-	public static void main(String[] args) {
-		try {
-			
-			System.out.println(Base64.getEncoder().encodeToString(HashUtils.getHash("SHA-512", "18660509556".getBytes("utf-8"),null,10)));
-			System.out.println(Base64.getEncoder().encodeToString(HashUtils.getHash("SHA-512", "18660509556".getBytes("utf-8"),null,5)));
-			System.out.println(Base64.getEncoder().encodeToString(HashUtils.getHash("SHA-512", "18660509556".getBytes("utf-8"),null,1)));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+
 }
