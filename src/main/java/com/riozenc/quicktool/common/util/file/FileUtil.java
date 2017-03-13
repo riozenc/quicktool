@@ -30,7 +30,7 @@ public class FileUtil {
 	 * @return
 	 * @throws Exception
 	 */
-	public static File uploadPictureByBase64(String base64Data, String path, String fileName) throws Exception {
+	public static File uploadPictureByBase64(String base64Data, String fileName) throws Exception {
 
 		String dataPrix = "";
 		String data = "";
@@ -57,7 +57,7 @@ public class FileUtil {
 		} else {
 			throw new Exception("上传图片格式不合法");
 		}
-		File file = FileUtil.createFile(path, fileName + suffix);
+		File file = FileUtil.createFile(fileName + suffix);
 		byte[] bs = Base64Utils.decodeFromString(data);
 		try {
 			// 使用apache提供的工具类操作流
@@ -77,10 +77,9 @@ public class FileUtil {
 		}
 	}
 
-	public static File createFile(String docPath, String fileName) {
-		File file = new File(docPath + File.separator + fileName);
+	public static File createFile(String fileName) {
+		File file = new File(fileName);
 		try {
-
 			if (file.exists()) {
 				if (file.isDirectory()) {
 					throw new IOException("File '" + file + "' exists but is a directory");
@@ -96,7 +95,6 @@ public class FileUtil {
 					}
 				}
 			}
-
 			file.createNewFile();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -104,6 +102,11 @@ public class FileUtil {
 			LogUtil.getLogger(LOG_TYPE.IO).error(e);
 		}
 		return file;
+
+	}
+
+	public static File createFile(String docPath, String fileName) {
+		return createFile(docPath + File.separator + fileName);
 	}
 
 	/**
