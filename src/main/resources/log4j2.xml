@@ -39,12 +39,26 @@
 			</PatternLayout>
 			<TimeBasedTriggeringPolicy />
 		</RollingFile>
+
+		<RollingFile name="main" fileName="logs/main/main.log"
+			filePattern="logs/main/main-%d{MM-dd-yyyy}.log.gz">
+			<PatternLayout>
+				<Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+			</PatternLayout>
+			<TimeBasedTriggeringPolicy />
+		</RollingFile>
+
 	</appenders>
 	<loggers>
 		<!-- <root level="debug"> -->
 		<root level="info">
 			<appender-ref ref="Console" />
 		</root>
+
+		<Logger name="main" level="trace" additivity="false">
+			<AppenderRef ref="Console" />
+			<AppenderRef ref="main" />
+		</Logger>
 
 		<Logger name="default" level="error" additivity="false">
 			<AppenderRef ref="default" />
