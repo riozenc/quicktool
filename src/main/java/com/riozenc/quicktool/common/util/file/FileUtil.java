@@ -46,7 +46,9 @@ public class FileUtil {
 			}
 		}
 		String suffix = null;
-		if ("data:image/jpeg;".equalsIgnoreCase(dataPrix)) {// data:image/jpeg;base64,base64编码的jpeg图片数据
+		if ("data:image/jpg;".equalsIgnoreCase(dataPrix)) {// data:image/jpeg;base64,base64编码的jpeg图片数据
+			suffix = ".jpg";
+		} else if ("data:image/jpeg;".equalsIgnoreCase(dataPrix)) {// data:image/jpeg;base64,base64编码的jpeg图片数据
 			suffix = ".jpg";
 		} else if ("data:image/x-icon;".equalsIgnoreCase(dataPrix)) {// data:image/x-icon;base64,base64编码的icon图片数据
 			suffix = ".ico";
