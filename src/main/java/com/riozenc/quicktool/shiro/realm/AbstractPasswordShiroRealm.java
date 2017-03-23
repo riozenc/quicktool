@@ -19,6 +19,8 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 
+import com.riozenc.quicktool.common.util.log.LogUtil;
+import com.riozenc.quicktool.common.util.log.LogUtil.LOG_TYPE;
 import com.riozenc.quicktool.shiro.Principal;
 import com.riozenc.quicktool.shiro.token.UsernamePasswordToken;
 
@@ -87,5 +89,8 @@ public abstract class AbstractPasswordShiroRealm extends AuthorizingRealm {
 		HashedCredentialsMatcher matcher = new HashedCredentialsMatcher(hashAlgorithmName);
 		matcher.setHashIterations(hashIterations);// 迭代1024次
 		setCredentialsMatcher(matcher);
+
+		LogUtil.getLogger(LOG_TYPE.MAIN).info(
+				"AbstractPasswordShiroRealm  initCredentialsMatcher(" + hashAlgorithmName + "," + hashIterations + ")");
 	}
 }
