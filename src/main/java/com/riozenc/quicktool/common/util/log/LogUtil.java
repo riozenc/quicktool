@@ -44,6 +44,8 @@ public class LogUtil {
 			return LogggerContext.getLogger("IO");
 		case ERROR:
 			return LogggerContext.getLogger("ERROR");
+		case MAIN:
+			return LogggerContext.getLogger("main");
 
 		default:
 			return LogggerContext.getLogger("default");
@@ -51,7 +53,7 @@ public class LogUtil {
 	}
 
 	public enum LOG_TYPE {
-		DB, IO, ERROR, OTHER, WEBSERVICE, CACHE
+		DB, IO, ERROR, OTHER, WEBSERVICE, CACHE, MAIN
 	}
 
 	public enum LOG_OUT_TYPE {
