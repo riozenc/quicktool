@@ -39,7 +39,8 @@ public class JSONUtil {
 		return toJsonString(object, false);
 	}
 
-	public static <T> T readValue(String json, Class<T> clazz) throws JsonParseException, JsonMappingException, IOException {
+	public static <T> T readValue(String json, Class<T> clazz)
+			throws JsonParseException, JsonMappingException, IOException {
 		return objectMapper.readValue(json, clazz);
 	}
 
@@ -128,18 +129,6 @@ public class JSONUtil {
 	}
 
 	/**
-	 * 输出Grid数据
-	 * 
-	 * @param data
-	 * @param totalCount
-	 * @param response
-	 * @throws IOException
-	 */
-	public static void writeJSONGrid(List<?> data, int totalCount, HttpServletResponse response) throws IOException {
-		JSONUtil.writeJSONGrid(new JSONGrid(totalCount, data.toArray()), response);
-	}
-
-	/**
 	 * 输出Tree数据
 	 * 
 	 * @param data
@@ -152,19 +141,6 @@ public class JSONUtil {
 		objectMapper.setSerializationInclusion(Include.NON_EMPTY);
 
 		JSONUtil.writeResponse(objectMapper.writeValueAsString(data), response);
-	}
-
-	/**
-	 * 
-	 * @param grid
-	 * @param response
-	 * @throws IOException
-	 */
-	private static void writeJSONGrid(JSONGrid grid, HttpServletResponse response) throws IOException {
-		ObjectMapper objectMapper = new ObjectMapper();
-		// 配置mapper忽略空属性
-		objectMapper.setSerializationInclusion(Include.NON_EMPTY);
-		JSONUtil.writeResponse(objectMapper.writeValueAsString(grid), response);
 	}
 
 	/**

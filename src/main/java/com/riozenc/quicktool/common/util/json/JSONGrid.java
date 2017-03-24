@@ -7,38 +7,51 @@
  */
 package com.riozenc.quicktool.common.util.json;
 
+import com.riozenc.quicktool.mybatis.persistence.Page;
+
 public class JSONGrid {
-	private int status = 0;
-	private int total = 0;
-	private Object rows;
+	private Integer totalRow;
+	private Integer pageCurrent;
+	private Object list;
 
-	public JSONGrid(int total, Object rows) {
-		this.total = total;
-		this.rows = rows;
+	public JSONGrid(Object list) {
+		this.list = list;
 	}
 
-	public int getStatus() {
-		return status;
+	public JSONGrid(Page<?> page, Object list) {
+		this.totalRow = page.getTotalRow();
+		this.pageCurrent = page.getPageCurrent();
+		this.list = list;
 	}
 
-	public void setStatus(int status) {
-		this.status = status;
+	public JSONGrid(int totalRow, int pageCurrent, Object list) {
+		this.totalRow = totalRow;
+		this.pageCurrent = pageCurrent;
+		this.list = list;
 	}
 
-	public int getTotal() {
-		return total;
+	public Integer getTotalRow() {
+		return totalRow;
 	}
 
-	public void setTotal(int total) {
-		this.total = total;
+	public void setTotalRow(Integer totalRow) {
+		this.totalRow = totalRow;
 	}
 
-	public Object getRows() {
-		return rows;
+	public Integer getPageCurrent() {
+		return pageCurrent;
 	}
 
-	public void setRows(Object rows) {
-		this.rows = rows;
+	public void setPageCurrent(Integer pageCurrent) {
+		this.pageCurrent = pageCurrent;
+	}
+
+	public Object getList() {
+		return list;
+	}
+
+	public void setList(Object list) {
+		this.list = list;
 	}
 
 }
