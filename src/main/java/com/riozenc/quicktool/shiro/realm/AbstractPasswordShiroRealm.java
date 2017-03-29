@@ -45,10 +45,12 @@ public abstract class AbstractPasswordShiroRealm extends AuthorizingRealm {
 	 */
 	public abstract int getHashIterations();
 
+	public abstract Principal createPrincipal();
+
 	private SimpleAuthenticationInfo createAuthenticationInfo(String password) {
 		try {
 			byte[] salt = Hex.decodeHex(password.substring(0, 16).toCharArray());
-			return new SimpleAuthenticationInfo(new Principal(), password.substring(16), ByteSource.Util.bytes(salt),
+			return new SimpleAuthenticationInfo(createPrincipal(), password.substring(16), ByteSource.Util.bytes(salt),
 					getName());
 		} catch (DecoderException e) {
 			// TODO Auto-generated catch block
