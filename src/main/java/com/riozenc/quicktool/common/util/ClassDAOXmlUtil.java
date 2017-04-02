@@ -17,6 +17,7 @@ import java.util.List;
 import com.riozenc.quicktool.annotation.TablePrimaryKey;
 import com.riozenc.quicktool.common.util.file.FileIoUtil;
 import com.riozenc.quicktool.common.util.file.FileUtil;
+import com.riozenc.quicktool.common.util.reflect.ReflectUtil;
 
 public class ClassDAOXmlUtil {
 
@@ -76,11 +77,11 @@ public class ClassDAOXmlUtil {
 
 	public static List<String> getPrimaryKeys(Class<?> clazz) {
 		List<String> list = new ArrayList<String>();
-		Field[] fields = clazz.getDeclaredFields();
+
+		Field[] fields = ReflectUtil.getFields(clazz);
 
 		Object value = null;
 		for (Field field : fields) {
-
 			value = field.getAnnotation(TablePrimaryKey.class);
 			if (null != value) {
 				list.add(field.getName());
@@ -93,8 +94,9 @@ public class ClassDAOXmlUtil {
 		if (isIf) {
 			return dynamicSqlFormat(fieldName, isAnd);
 		} else {
-			//用于生成主键，update和delete必须有条件
-			return (isAnd ? " and " : "") + StringUtils.allToUpper(fieldName) + " = #{" + fieldName + "}" + (isAnd ? "" : ",") + "\n";
+			// 用于生成主键，update和delete必须有条件
+			return (isAnd ? " and " : "") + StringUtils.allToUpper(fieldName) + " = #{" + fieldName + "}"
+					+ (isAnd ? "" : ",") + "\n";
 		}
 	}
 
@@ -192,7 +194,7 @@ public class ClassDAOXmlUtil {
 			sb.append("<where>");
 			sb.append("\n");
 			for (String fieldName : getPrimaryKeys(clazz)) {
-				sb.append(dynamicSqlFormat(fieldName, true,false));
+				sb.append(dynamicSqlFormat(fieldName, true, false));
 				sb.append("\n");
 			}
 			sb.append("</where>");
@@ -258,7 +260,7 @@ public class ClassDAOXmlUtil {
 			sb.append("<where>");
 			sb.append("\n");
 			for (String fieldName : getPrimaryKeys(clazz)) {
-				sb.append(dynamicSqlFormat(fieldName, true,false));
+				sb.append(dynamicSqlFormat(fieldName, true, false));
 				sb.append("\n");
 			}
 			sb.append("</where>");
@@ -284,7 +286,7 @@ public class ClassDAOXmlUtil {
 			sb.append("<where>");
 			sb.append("\n");
 			for (String fieldName : getPrimaryKeys(clazz)) {
-				sb.append(dynamicSqlFormat(fieldName, true,false));
+				sb.append(dynamicSqlFormat(fieldName, true, false));
 				sb.append("\n");
 			}
 			sb.append("</where>");

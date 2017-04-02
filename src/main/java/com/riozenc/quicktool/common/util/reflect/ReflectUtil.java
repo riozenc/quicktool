@@ -14,13 +14,34 @@ import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.riozenc.quicktool.annotation.ReflectionIgnore;
 import com.riozenc.quicktool.common.util.date.DateUtil;
 import com.riozenc.quicktool.common.util.reflect.MethodGen.METHOD_TYPE;
 
 public class ReflectUtil {
+
+	/**
+	 * 获取指定CLASS的属性,包括上级类
+	 * 
+	 * @param clazz
+	 * @return
+	 */
+	public static Field[] getFields(Class<?> clazz) {
+		LinkedList<Field> list = new LinkedList<>();
+		for (Class<?> superClass = clazz; superClass != Object.class; superClass = superClass.getSuperclass()) {
+			Field[] fields = superClass.getDeclaredFields();
+			for (Field field : fields) {
+				if (field.getAnnotation(ReflectionIgnore.class) == null) {
+					list.add(field);
+				}
+			}
+		}
+		return list.toArray(new Field[0]);
+	}
 
 	/**
 	 * 直接读取对象属性值, 无视private/protected修饰符, 不经过getter函数.
@@ -106,9 +127,9 @@ public class ReflectUtil {
 		for (Class<?> superClass = obj.getClass(); superClass != Object.class; superClass = superClass
 				.getSuperclass()) {
 			try {
-				
+
 				superClass.getMethods();
-				
+
 				Method method = superClass.getDeclaredMethod(MethodGen.generateMethodName(methodType, fieldName),
 						parameterTypes);
 				makeAccessible(method);
