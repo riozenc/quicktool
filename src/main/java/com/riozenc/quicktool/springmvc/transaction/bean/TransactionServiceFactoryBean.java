@@ -86,7 +86,7 @@ public class TransactionServiceFactoryBean<T> implements FactoryBean<T> {
 			BeanDefinitionHolder beanDefinitionHolder = definitionHolderMap
 					.get(StringUtils.decapitalize(dao.getType().getSimpleName()));
 			if (beanDefinitionHolder == null) {
-				throw new Exception(dao.getName() + " is not found @TransactionDAO!");
+				throw new Exception(dao.getType() + " is not found @TransactionDAO!");
 			}
 			AbstractTransactionDAOSupport abstractDAOSupport = (AbstractTransactionDAOSupport) BeanUtils
 					.instantiate(dao.getType());
