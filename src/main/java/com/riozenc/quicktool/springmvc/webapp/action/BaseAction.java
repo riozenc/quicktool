@@ -49,7 +49,7 @@ public class BaseAction {
 		binder.registerCustomEditor(String.class, new PropertyEditorSupport() {
 			@Override
 			public void setAsText(String text) {
-				setValue(text == null ? null : StringEscapeUtils.escapeHtml4(text.trim()));
+				setValue((text == null || "".equals(text.trim())) ? null : StringEscapeUtils.escapeHtml4(text.trim()));
 			}
 
 			@Override
@@ -62,7 +62,11 @@ public class BaseAction {
 		binder.registerCustomEditor(Date.class, new PropertyEditorSupport() {
 			@Override
 			public void setAsText(String text) {
-				setValue(DateUtil.parseDate(text));
+				if (text.length() == 10) {
+					setValue(DateUtil.parseDate(text));
+				} else {
+					setValue(DateUtil.parseDateTime(text));
+				}
 			}
 
 		});
