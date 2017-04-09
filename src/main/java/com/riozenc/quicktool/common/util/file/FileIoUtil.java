@@ -22,10 +22,8 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import org.springframework.core.io.support.ResourcePatternResolver;
-
 import com.riozenc.quicktool.common.util.ClassUtils;
-import com.riozenc.quicktool.common.util.file.filter.ClassFileFilter;
+import com.riozenc.quicktool.common.util.file.filter.FileTypeFilter;
 
 public class FileIoUtil {
 
@@ -41,7 +39,7 @@ public class FileIoUtil {
 	}
 
 	// 过滤器
-	private static FileFilter filenameFilter = ClassFileFilter.getFilter(recursive, "class");
+	private static FileFilter filenameFilter = FileTypeFilter.getInstance(recursive, "class");
 
 	/**
 	 * 获得包下面的所有的class
@@ -62,9 +60,11 @@ public class FileIoUtil {
 
 		try {
 
-//			String packageSearchPath = CLASSPATH_ALL_URL_PREFIX + packageDirName + "/" + DEFAULT_RESOURCE_PATTERN;
+			 String packageSearchPath = CLASSPATH_ALL_URL_PREFIX +
+			 packageDirName + "/" + DEFAULT_RESOURCE_PATTERN;
 			dirs = ClassUtils.getDefaultClassLoader().getResources(packageDirName);
-//			dirs = Thread.currentThread().getContextClassLoader().getResources(packageDirName);
+			// dirs =
+			// Thread.currentThread().getContextClassLoader().getResources(packageDirName);
 			while (dirs.hasMoreElements()) {
 				URL url = dirs.nextElement();
 				String protocol = url.getProtocol();

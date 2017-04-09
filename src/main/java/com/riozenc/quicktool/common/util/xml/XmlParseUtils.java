@@ -6,30 +6,22 @@
  */
 package com.riozenc.quicktool.common.util.xml;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
+import com.riozenc.quicktool.common.util.ClassUtils;
+
 public class XmlParseUtils {
 
-	public static Element parse(String xmlPath) throws FileNotFoundException, DocumentException {
-		String projectPath = System.getProperty("user.dir");
-		// File file = new File(projectPath + File.separator + "config.xml");
-		File file = new File(xmlPath);
-		if (!file.exists()) {
-			throw new FileNotFoundException(xmlPath + " is not found...");
-		} else {
-			System.out.println("开始读取config.xml");
-		}
+	public static Element parse(String xmlPath) throws DocumentException {
+
 		SAXReader saxReader = new SAXReader();
-		Document document = saxReader.read(file);
+		Document document = saxReader.read(ClassUtils.getDefaultClassLoader().getResourceAsStream(xmlPath));
 
 		Element element = document.getRootElement();
 		return element;
-
 	}
+
 }

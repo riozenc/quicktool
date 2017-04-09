@@ -7,13 +7,10 @@ package com.riozenc.quicktool.common.util.file;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.util.Base64Utils;
 
-import com.riozenc.quicktool.common.util.file.filter.ClassFileFilter;
 import com.riozenc.quicktool.common.util.log.LogUtil;
 import com.riozenc.quicktool.common.util.log.LogUtil.LOG_TYPE;
 import com.riozenc.quicktool.config.Global;
@@ -156,34 +153,6 @@ public class FileUtil {
 		} else {
 			throw new BadFileException(file.getPath() + "文件不存在。。。");
 		}
-	}
-
-	/**
-	 * 获取指定目录下的执行文件
-	 * 
-	 * @param filePath
-	 * @param type
-	 * @return
-	 */
-	public static Map<String, File> getFilesByPath(String filePath, String type) {
-		Map<String, File> map = new HashMap<String, File>();
-		File dir = new File(filePath);
-		if (!dir.exists() || !dir.isDirectory()) {
-			return null;
-		}
-
-		// 在给定的目录下找到所有的文件，并且进行条件过滤
-		File[] dirFiles = dir.listFiles(ClassFileFilter.getFilter(false, "xml"));
-		for (File file : dirFiles) {
-			System.out.println(file.getName());
-			map.put(file.getName(), file);
-		}
-		return map;
-	}
-
-	public static void main(String[] args) {
-		getFilesByPath("C:\\Users\\rioze\\Desktop\\xml", "xml");
-
 	}
 
 }
