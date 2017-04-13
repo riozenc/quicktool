@@ -30,7 +30,7 @@ public class JSONGrid {
 		this.list = list;
 	}
 
-	public Integer getTotalRow() {
+	public Integer getTotal() {
 		return totalRow;
 	}
 
@@ -46,7 +46,7 @@ public class JSONGrid {
 		this.pageCurrent = pageCurrent;
 	}
 
-	public Object getList() {
+	public Object getData() {
 		return list;
 	}
 
