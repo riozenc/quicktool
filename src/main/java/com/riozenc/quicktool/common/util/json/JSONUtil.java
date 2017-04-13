@@ -22,8 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class JSONUtil {
 
 	private static ObjectMapper objectMapper = new ObjectMapper();
-	private static final int SUCCESS = 0;
-	private static final int FAILED = 1;
 
 	static {
 		objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
@@ -63,65 +61,25 @@ public class JSONUtil {
 	}
 
 	/**
-	 * 输出成功信息
+	 * 输出信息
 	 * 
 	 * @param msg
 	 * @param response
 	 * @throws IOException
 	 */
-	public static void writeSuccessMsg(String msg, HttpServletResponse response) throws IOException {
-		JSONUtil.writeResponse("{\"status\":" + SUCCESS + ",\"msg\":\"" + msg + "\"}", response);
+	public static void writeMsg(String code, String msg, HttpServletResponse response) throws IOException {
+		JSONUtil.writeResponse("{\"status\":" + code + ",\"msg\":\"" + msg + "\"}", response);
 	}
 
 	/**
-	 * 输出成功信息
+	 * 输出信息
 	 * 
 	 * @param msg
 	 * @param response
 	 * @throws IOException
 	 */
-	public static String writeSuccessMsg(String msg) {
-		return "{\"status\":" + SUCCESS + ",\"msg\":\"" + msg + "\"}";
-	}
-
-	/**
-	 * 输出成功
-	 * 
-	 * @param response
-	 * @throws IOException
-	 */
-	public static void writeSuccess(HttpServletResponse response) throws IOException {
-		JSONUtil.writeResponse("{\"status\":" + SUCCESS + "}", response);
-	}
-
-	/**
-	 * 输出失败
-	 * 
-	 * @param response
-	 * @throws IOException
-	 */
-	public static void writeError(HttpServletResponse response) throws IOException {
-		JSONUtil.writeResponse("{\"status\":" + FAILED + "}", response);
-	}
-
-	/**
-	 * 输出失败信息
-	 * 
-	 * @param response
-	 * @throws IOException
-	 */
-	public static void writeErrorMsg(String msg, HttpServletResponse response) throws IOException {
-		JSONUtil.writeResponse("{\"status\":" + FAILED + ",\"msg\":\"" + msg + "\"}", response);
-	}
-
-	/**
-	 * 输出失败信息
-	 * 
-	 * @param response
-	 * @throws IOException
-	 */
-	public static String writeErrorMsg(String msg) {
-		return "{\"status\":" + FAILED + ",\"msg\":\"" + msg + "\"}";
+	public static String writeMsg(String code, String msg) {
+		return "{\"status\":" + code + ",\"msg\":\"" + msg + "\"}";
 	}
 
 	public static void wirteInfo(String msg, HttpServletResponse response) throws IOException {
