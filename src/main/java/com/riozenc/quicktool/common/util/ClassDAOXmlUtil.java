@@ -24,7 +24,8 @@ public class ClassDAOXmlUtil {
 	public static String getInsert(Class<?> clazz) {
 		StringBuffer sb = new StringBuffer();
 
-		Field[] fields = clazz.getDeclaredFields();
+//		Field[] fields = clazz.getDeclaredFields();
+		Field[] fields = ReflectUtil.getFields(clazz);
 
 		sb.append("(");
 		for (Field field : fields) {
@@ -38,7 +39,8 @@ public class ClassDAOXmlUtil {
 	public static String getUpdate(Class<?> clazz) {
 		StringBuffer sb = new StringBuffer();
 
-		Field[] fields = clazz.getDeclaredFields();
+//		Field[] fields = clazz.getDeclaredFields();
+		Field[] fields = ReflectUtil.getFields(clazz);
 
 		for (Field field : fields) {
 			if (field.getAnnotation(TablePrimaryKey.class) != null) {
@@ -65,7 +67,8 @@ public class ClassDAOXmlUtil {
 
 	public static String getColumns(Class<?> clazz) {
 		StringBuffer sb = new StringBuffer();
-		Field[] fields = clazz.getDeclaredFields();
+//		Field[] fields = clazz.getDeclaredFields();
+		Field[] fields = ReflectUtil.getFields(clazz);
 
 		for (Field field : fields) {
 
@@ -215,7 +218,7 @@ public class ClassDAOXmlUtil {
 		sb.append("\n");
 		sb.append("<where>");
 		sb.append("\n");
-		Field[] fields = clazz.getDeclaredFields();
+		Field[] fields = ReflectUtil.getFields(clazz);
 		for (Field field : fields) {
 			sb.append(dynamicSqlFormat(field.getName(), true));
 			sb.append("\n");
