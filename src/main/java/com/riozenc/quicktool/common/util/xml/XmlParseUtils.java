@@ -16,6 +16,12 @@ import org.dom4j.io.SAXReader;
 import com.riozenc.quicktool.common.util.ClassUtils;
 import com.riozenc.quicktool.common.util.reflect.ReflectUtil;
 
+/**
+ * 待优化，目前只能转型指定对象，无法转型Map
+ * 
+ * @author riozenc
+ *
+ */
 public class XmlParseUtils {
 
 	public static Element parse(String xmlPath) throws DocumentException {
@@ -30,7 +36,7 @@ public class XmlParseUtils {
 	public static <T> T xmlToBean(Element element, Class<T> clazz)
 			throws InstantiationException, IllegalAccessException {
 
-		Object obj = clazz.newInstance();
+		T obj = clazz.newInstance();
 		String className = clazz.getSimpleName().toLowerCase();
 		Element classElement = element.element(className);
 
@@ -57,7 +63,7 @@ public class XmlParseUtils {
 			}
 		}
 
-		return (T) obj;
+		return obj;
 	}
 
 }
