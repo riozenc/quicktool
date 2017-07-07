@@ -19,7 +19,7 @@ public class XmlUtils {
 		if (object == null)
 			throw new NullPointerException("参数不能为null...");
 		Field[] fields = object.getClass().getDeclaredFields();
-		String className = object.getClass().getSimpleName();
+		String className = object.getClass().getSimpleName().toLowerCase();
 		if (fields == null || fields.length == 0)
 			throw new RuntimeException(object.getClass() + "没有属性...");
 		Document document = DocumentHelper.createDocument();

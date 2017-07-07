@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
@@ -24,13 +25,24 @@ import com.riozenc.quicktool.common.util.reflect.ReflectUtil;
  */
 public class XmlParseUtils {
 
-	public static Element parse(String xmlPath) throws DocumentException {
-
+	public static Element readXml(String xmlPath) throws DocumentException {
 		SAXReader saxReader = new SAXReader();
 		Document document = saxReader.read(ClassUtils.getDefaultClassLoader().getResourceAsStream(xmlPath));
-
 		Element element = document.getRootElement();
 		return element;
+	}
+
+	public static Element toElement(String xml) throws DocumentException {
+		Document document = DocumentHelper.parseText(xml);
+		Element element = document.getRootElement();
+		return element;
+	}
+
+	public static <T> T xmlToBean(String xml, Class<T> clazz)
+			throws DocumentException, InstantiationException, IllegalAccessException {
+		Document document = DocumentHelper.parseText(xml);
+		Element element = document.getRootElement();
+		return xmlToBean(element, clazz);
 	}
 
 	public static <T> T xmlToBean(Element element, Class<T> clazz)
