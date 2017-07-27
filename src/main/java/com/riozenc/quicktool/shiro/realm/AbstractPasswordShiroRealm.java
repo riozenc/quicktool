@@ -29,28 +29,38 @@ public abstract class AbstractPasswordShiroRealm extends AuthorizingRealm {
 	private String hashAlgorithmName = "SHA-512";
 	private int hashIterations = 1024;
 
-	public abstract String getPassword();
+	/**
+	 * 获取密码
+	 * 
+	 * @return
+	 */
+	public abstract String getPassword(String loginName);
 
 	/**
-	 * 返回null则使用默认值
+	 * 获取加密算法返回null 则使用默认值
 	 * 
 	 * @return
 	 */
 	protected abstract String getHashAlgorithmName();
 
 	/**
-	 * 返回0则使用默认值
+	 * 获取加密算法循环次数 返回0则使用默认值
 	 * 
 	 * @return
 	 */
 	public abstract int getHashIterations();
 
-	public abstract Principal createPrincipal();
+	/**
+	 * 返回认证对象
+	 * 
+	 * @return
+	 */
+	public abstract Principal createPrincipal(String loginName);
 
-	private SimpleAuthenticationInfo createAuthenticationInfo(String password) {
+	private SimpleAuthenticationInfo createAuthenticationInfo(String loginName, String password) {
 		try {
 			byte[] salt = Hex.decodeHex(password.substring(0, 16).toCharArray());
-			return new SimpleAuthenticationInfo(createPrincipal(), password.substring(16), ByteSource.Util.bytes(salt),
+			return new SimpleAuthenticationInfo(createPrincipal(loginName), password.substring(16), ByteSource.Util.bytes(salt),
 					getName());
 		} catch (DecoderException e) {
 			// TODO Auto-generated catch block
@@ -70,11 +80,11 @@ public abstract class AbstractPasswordShiroRealm extends AuthorizingRealm {
 		// TODO Auto-generated method stub
 
 		UsernamePasswordToken usernamePasswordToken = (UsernamePasswordToken) token;
-		String username = usernamePasswordToken.getUsername();
-		if (username != null && !"".equals(username.trim())) {
-			String password = getPassword();
+		String loginName = usernamePasswordToken.getUsername();
+		if (loginName != null && !"".equals(loginName.trim())) {
+			String password = getPassword(loginName);
 			if (password != null) {
-				return createAuthenticationInfo(password);
+				return createAuthenticationInfo(loginName, password);
 			}
 		}
 		return null;
