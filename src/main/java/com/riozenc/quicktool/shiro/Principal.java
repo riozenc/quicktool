@@ -20,10 +20,6 @@ public class Principal {
 	private Date lastLoginDate;// 最后登陆时间 LAST_LOGIN_DATE datetime
 	private Date updateDate;// 最后更新时间 UPDATE_DATE datetime
 
-	public Principal() {
-
-	}
-
 	public Integer getId() {
 		return id;
 	}

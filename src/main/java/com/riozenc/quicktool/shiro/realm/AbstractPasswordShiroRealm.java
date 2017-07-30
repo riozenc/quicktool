@@ -21,7 +21,6 @@ import org.apache.shiro.util.ByteSource;
 
 import com.riozenc.quicktool.common.util.log.LogUtil;
 import com.riozenc.quicktool.common.util.log.LogUtil.LOG_TYPE;
-import com.riozenc.quicktool.shiro.Principal;
 import com.riozenc.quicktool.shiro.token.UsernamePasswordToken;
 
 public abstract class AbstractPasswordShiroRealm extends AuthorizingRealm {
@@ -55,7 +54,7 @@ public abstract class AbstractPasswordShiroRealm extends AuthorizingRealm {
 	 * 
 	 * @return
 	 */
-	public abstract Principal createPrincipal(String loginName);
+	public abstract Object createPrincipal(String loginName);
 
 	private SimpleAuthenticationInfo createAuthenticationInfo(String loginName, String password) {
 		try {
