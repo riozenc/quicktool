@@ -21,8 +21,7 @@ import com.riozenc.quicktool.common.util.StringUtils;
 
 public class ClassCastUtil {
 
-	private static final Logger LOGGER = LogManager
-			.getLogger(ClassCastUtil.class);
+	private static final Logger LOGGER = LogManager.getLogger(ClassCastUtil.class);
 
 	// public static Object xx(Object srcObj, Class<?> tarClazz){
 	// Object obj=null;
@@ -72,13 +71,10 @@ public class ClassCastUtil {
 							upperName = StringUtils.fristToUpper(tarFieldName);
 
 							tarFieldType = tarField.getType();
-							method = srcClazz.getDeclaredMethod("get"
-									+ upperName, null);
+							method = srcClazz.getDeclaredMethod("get" + upperName, null);
 							result = method.invoke(srcObj, new Object[] {});
-							result = ReflectUtil.typeFormat(tarFieldType,
-									result);
-							method = tarClazz.getMethod("set" + upperName,
-									new Class[] { tarFieldType });
+							result = ReflectUtil.typeFormat(tarFieldType, result);
+							method = tarClazz.getMethod("set" + upperName, new Class[] { tarFieldType });
 							method.invoke(tarObj, new Object[] { result });
 							// sb.append(tarFieldName)
 							// .append("=")
@@ -131,20 +127,4 @@ public class ClassCastUtil {
 		return result;
 	}
 
-	public static void main(String[] args) {
-		try {
-			Class clazz = Class
-					.forName("com.wisdom.gy.interactionMarketing.msgbox.webservice.server.ba.khdazlxxtb.KHDAZLXXTBInType");
-
-			Method[] methods = clazz.getDeclaredMethods();
-
-			for (Method method : methods) {
-				System.out.println(method.getName());
-			}
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
 }
