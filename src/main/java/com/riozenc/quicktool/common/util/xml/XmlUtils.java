@@ -16,10 +16,24 @@ import com.riozenc.quicktool.mybatis.MybatisEntity;
 
 public class XmlUtils {
 
+	public static String object2xml(Object object, boolean isSuper) {
+		Field[] fields = null;
+		if (isSuper) {
+			fields = ReflectUtil.getFields(object.getClass());
+		} else {
+			fields = object.getClass().getDeclaredFields();
+		}
+		return field2Xml(object, fields);
+	}
+
 	public static String object2xml(Object object) {
+		return object2xml(object, false);
+	}
+
+	private static String field2Xml(Object object, Field[] fields) {
 		if (object == null)
 			throw new NullPointerException("参数不能为null...");
-		Field[] fields = ReflectUtil.getFields(object.getClass());
+
 		String className = object.getClass().getSimpleName().toLowerCase();
 		if (fields == null || fields.length == 0)
 			throw new RuntimeException(object.getClass() + "没有属性...");
@@ -27,14 +41,12 @@ public class XmlUtils {
 		Element rootElement = document.addElement(className);
 		for (Field field : fields) {
 			Object value = ReflectUtil.getFieldValue(object, field.getName());
-
 			if (value != null) {
 				Element element = rootElement.addElement(field.getName());
 				if (value instanceof MybatisEntity) {
-					object2xml(value, element);
+					object2Element(value, element);
 				} else {
 					try {
-
 						element.setText((String) ReflectUtil.typeFormat(String.class, value));
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
@@ -47,7 +59,7 @@ public class XmlUtils {
 		return document.getRootElement().asXML();
 	}
 
-	private static void object2xml(Object object, Element rootElement) {
+	private static void object2Element(Object object, Element rootElement) {
 		Field[] fields = ReflectUtil.getFields(object.getClass());
 		if (fields == null || fields.length == 0)
 			throw new RuntimeException(object.getClass() + "没有属性...");
@@ -56,10 +68,9 @@ public class XmlUtils {
 			if (value != null) {
 				Element element = rootElement.addElement(field.getName());
 				if (value instanceof MybatisEntity) {
-					object2xml(value, element);
+					object2Element(value, element);
 				} else {
 					try {
-
 						element.setText((String) ReflectUtil.typeFormat(String.class, value));
 					} catch (Exception e) {
 						// TODO Auto-generated catch block

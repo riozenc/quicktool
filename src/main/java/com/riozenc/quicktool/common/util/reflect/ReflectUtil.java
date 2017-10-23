@@ -63,15 +63,15 @@ public class ReflectUtil {
 	}
 
 	/**
-	 * 直接设置对象属性值, 无视private/protected修饰符, 不经过setter函数.
+	 * 直接设置对象属性值, 无视private/protected修饰符, 不经过setter函数.final参数直接跳过
 	 */
 	public static void setFieldValue(final Object obj, final String fieldName, final Object value) {
 		Field field = getAccessibleField(obj, fieldName);
-
 		if (field == null) {
 			throw new IllegalArgumentException("Could not find field [" + fieldName + "] on target [" + obj + "]");
 		}
-
+		if (Modifier.isFinal(field.getModifiers()))
+			return;
 		try {
 			field.set(obj, value);
 		} catch (IllegalAccessException e) {
