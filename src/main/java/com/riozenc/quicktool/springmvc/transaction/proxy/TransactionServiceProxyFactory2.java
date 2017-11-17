@@ -80,6 +80,7 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 
 		try {
 			if (methodName.startsWith("get") || methodName.startsWith("find")) {// 查询方法无事务
+				LOGGER.info(methodName + " is select method,no transaction");
 				Object rev = method.invoke(targetObject, args);
 				recovery();// 回收sqlSession！注意select也需要回收
 				return rev;
