@@ -49,8 +49,7 @@ public class StringUtils {
 	 * @param cs
 	 *            the CharSequence to check, may be null
 	 * @return {@code true} if the CharSequence is empty or null
-	 * @since 3.0 Changed signature from isEmpty(String) to
-	 *        isEmpty(CharSequence)
+	 * @since 3.0 Changed signature from isEmpty(String) to isEmpty(CharSequence)
 	 */
 	public static boolean isEmpty(final CharSequence cs) {
 		return cs == null || cs.length() == 0;
@@ -73,8 +72,7 @@ public class StringUtils {
 	 *            the CharSequence to check, may be null
 	 * @return {@code true} if the CharSequence is null, empty or whitespace
 	 * @since 2.0
-	 * @since 3.0 Changed signature from isBlank(String) to
-	 *        isBlank(CharSequence)
+	 * @since 3.0 Changed signature from isBlank(String) to isBlank(CharSequence)
 	 */
 	public static boolean isBlank(final CharSequence cs) {
 		int strLen;
@@ -166,16 +164,16 @@ public class StringUtils {
 	 * <p>
 	 * Trims tokens and omits empty tokens.
 	 * <p>
-	 * The given {@code delimiters} string can consist of any number of
-	 * delimiter characters. Each of those characters can be used to separate
-	 * tokens. A delimiter is always a single character; for multi-character
-	 * delimiters, consider using {@link #delimitedListToStringArray}.
+	 * The given {@code delimiters} string can consist of any number of delimiter
+	 * characters. Each of those characters can be used to separate tokens. A
+	 * delimiter is always a single character; for multi-character delimiters,
+	 * consider using {@link #delimitedListToStringArray}.
 	 * 
 	 * @param str
 	 *            the {@code String} to tokenize
 	 * @param delimiters
-	 *            the delimiter characters, assembled as a {@code String} (each
-	 *            of the characters is individually considered as a delimiter)
+	 *            the delimiter characters, assembled as a {@code String} (each of
+	 *            the characters is individually considered as a delimiter)
 	 * @return an array of the tokens
 	 * @see java.util.StringTokenizer
 	 * @see String#trim()
@@ -189,24 +187,24 @@ public class StringUtils {
 	 * Tokenize the given {@code String} into a {@code String} array via a
 	 * {@link StringTokenizer}.
 	 * <p>
-	 * The given {@code delimiters} string can consist of any number of
-	 * delimiter characters. Each of those characters can be used to separate
-	 * tokens. A delimiter is always a single character; for multi-character
-	 * delimiters, consider using {@link #delimitedListToStringArray}.
+	 * The given {@code delimiters} string can consist of any number of delimiter
+	 * characters. Each of those characters can be used to separate tokens. A
+	 * delimiter is always a single character; for multi-character delimiters,
+	 * consider using {@link #delimitedListToStringArray}.
 	 * 
 	 * @param str
 	 *            the {@code String} to tokenize
 	 * @param delimiters
-	 *            the delimiter characters, assembled as a {@code String} (each
-	 *            of the characters is individually considered as a delimiter)
+	 *            the delimiter characters, assembled as a {@code String} (each of
+	 *            the characters is individually considered as a delimiter)
 	 * @param trimTokens
 	 *            trim the tokens via {@link String#trim()}
 	 * @param ignoreEmptyTokens
-	 *            omit empty tokens from the result array (only applies to
-	 *            tokens that are empty after trimming; StringTokenizer will not
-	 *            consider subsequent delimiters as token in the first place).
-	 * @return an array of the tokens ({@code null} if the input {@code String}
-	 *         was {@code null})
+	 *            omit empty tokens from the result array (only applies to tokens
+	 *            that are empty after trimming; StringTokenizer will not consider
+	 *            subsequent delimiters as token in the first place).
+	 * @return an array of the tokens ({@code null} if the input {@code String} was
+	 *         {@code null})
 	 * @see java.util.StringTokenizer
 	 * @see String#trim()
 	 * @see #delimitedListToStringArray
@@ -266,4 +264,40 @@ public class StringUtils {
 		return new String(chars);
 	}
 
+	/**
+	 * 将数据库字段转换为对象属性名 USER_NO --> userNo
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public static String h2s(String name) {
+		StringBuffer sb = null;
+
+		sb = new StringBuffer();
+
+		if (name.indexOf("_") > 0) {
+
+			char[] cs = name.toCharArray();
+			int i = 0;
+
+			// 特殊处理，属性aBc的set方法为setaBc
+			if (cs[1] == '_') {
+				sb.append(Character.toLowerCase(cs[0]));
+				i = 1;
+			}
+
+			for (; i < cs.length; i++) {
+				if (cs[i] == '_') {
+					i++;
+					sb.append(Character.toUpperCase(cs[i]));
+				} else {
+					sb.append(Character.toLowerCase(cs[i]));
+				}
+			}
+		} else {
+			sb.append(name.toLowerCase());
+		}
+
+		return sb.toString();
+	}
 }

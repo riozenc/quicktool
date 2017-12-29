@@ -10,13 +10,21 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import com.riozenc.quicktool.common.util.StringUtils;
+import com.riozenc.quicktool.common.util.reflect.ReflectUtil;
 
 /**
  * excel解析器
@@ -25,46 +33,74 @@ import org.apache.poi.ss.usermodel.Cell;
  *
  */
 public class ExcelUtil {
-	public static void main(String[] args) {
-		File file = new File("D:\\test\\桂东电力规上企业用户.xls");
-
-		parse(file, null);
-	}
 
 	public static <T> List<T> parse(File file, Class<T> clazz) {
-
+		List<String> columnNames = new ArrayList<String>();
+		List<T> list = new ArrayList<>();
+		Field[] fields = clazz.getDeclaredFields();
 		try {
-			HSSFWorkbook hssfWorkbook = new HSSFWorkbook(new FileInputStream(file));
+			Workbook wb = null;
+			if (isExcel2003(file.getName())) {
+				wb = new HSSFWorkbook(new FileInputStream(file));
+			} else {
+				wb = new XSSFWorkbook(file);
+			}
+			Sheet sheet = null;
+			Row row = null;
+			Cell cell = null;
 			// 循环工作表Sheet
-			for (int numSheet = 0; numSheet < hssfWorkbook.getNumberOfSheets(); numSheet++) {
-				HSSFSheet hssfSheet = hssfWorkbook.getSheetAt(numSheet);
-				if (hssfSheet == null) {
+			for (int numSheet = 0; numSheet < wb.getNumberOfSheets(); numSheet++) {
+				sheet = wb.getSheetAt(numSheet);
+				if (sheet == null) {
 					continue;
 				}
-
 				// 循环行Row
-				for (int rowNum = 0; rowNum <= hssfSheet.getLastRowNum(); rowNum++) {
-					HSSFRow hssfRow = hssfSheet.getRow(rowNum);
-					if (hssfRow == null) {
+				for (int rowNum = 0; rowNum <= sheet.getLastRowNum(); rowNum++) {
+					row = sheet.getRow(rowNum);
+					if (row == null) {
 						continue;
 					}
-
 					// 循环列Cell
-					for (int cellNum = 0; cellNum <= hssfRow.getLastCellNum(); cellNum++) {
-						HSSFCell hssfCell = hssfRow.getCell(cellNum);
-						if (hssfCell == null) {
+					for (int cellNum = 0; cellNum <= row.getLastCellNum(); cellNum++) {
+						cell = row.getCell(cellNum);
+						if (cell == null) {
 							continue;
 						}
+						if (rowNum == 0) {
+							columnNames.add(getValue(cell));// 获取字段
+						} else {
+							// 拼装对象
+							if (columnNames.size() > 0) {
+								T t = clazz.newInstance();
+								for (String temp : columnNames) {
+									for (Field field : fields) {
+										if (field.getName().equals(StringUtils.h2s(temp))) {
+											ReflectUtil.setFieldValue(t, field.getName(), getValue(cell));
+										}
+									}
+								}
+								list.add(t);
+							}
+						}
 
-						System.out.print("    " + getValue(hssfCell));
 					}
-					System.out.println();
+
 				}
 			}
+			return list;
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -72,13 +108,18 @@ public class ExcelUtil {
 		return null;
 	}
 
-	private static String getValue(HSSFCell hssfCell) {
-		if (hssfCell.getCellType() == Cell.CELL_TYPE_BOOLEAN) {
-			return String.valueOf(hssfCell.getBooleanCellValue());
-		} else if (hssfCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
-			return String.valueOf(hssfCell.getNumericCellValue());
+	private static String getValue(Cell cell) {
+		if (cell.getCellTypeEnum() == CellType.BOOLEAN) {
+			return String.valueOf(cell.getBooleanCellValue());
+		} else if (cell.getCellTypeEnum() == CellType.NUMERIC) {
+			return String.valueOf(cell.getNumericCellValue());
 		} else {
-			return String.valueOf(hssfCell.getStringCellValue());
+			return String.valueOf(cell.getStringCellValue());
 		}
+	}
+
+	private static boolean isExcel2003(String filePath) {
+		return filePath.matches("^.+\\.(?i)(xls)$");
+
 	}
 }

@@ -12,51 +12,18 @@ import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.riozenc.quicktool.common.util.StringUtils;
+
 /**
  *
  * @author Riozenc
  */
 public class ResultSetCaseUtil {
 
-	/**
-	 * 将数据库字段转换为对象属性名
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public static String lowerCase(String name) {
-		StringBuffer sb = null;
-
-		sb = new StringBuffer();
-
-		if (name.indexOf("_") > 0) {
-
-			char[] cs = name.toCharArray();
-			int i = 0;
-
-			// 特殊处理，属性aBc的set方法为setaBc
-			if (cs[1] == '_') {
-				sb.append(Character.toLowerCase(cs[0]));
-				i = 1;
-			}
-
-			for (; i < cs.length; i++) {
-				if (cs[i] == '_') {
-					i++;
-					sb.append(Character.toUpperCase(cs[i]));
-				} else {
-					sb.append(Character.toLowerCase(cs[i]));
-				}
-			}
-		} else {
-			sb.append(name.toLowerCase());
-		}
-
-		return sb.toString();
-	}
+	
 
 	public static void main(String[] args) {
-		System.out.println(lowerCase("qysx_id"));
+		System.out.println(StringUtils.h2s("qysx_id"));
 	}
 
 	/**
@@ -91,7 +58,7 @@ public class ResultSetCaseUtil {
 				i = 0;
 				obj = clazz.newInstance();
 				for (; i < numberOfColumns; i++) {
-					temp = lowerCase(metaData.getColumnLabel(i + 1));
+					temp = StringUtils.h2s(metaData.getColumnLabel(i + 1));
 					//
 					// field = classEntity.getFieldMap().get(temp);
 
