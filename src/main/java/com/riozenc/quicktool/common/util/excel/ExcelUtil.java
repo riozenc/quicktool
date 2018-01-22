@@ -23,7 +23,9 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.riozenc.quicktool.annotation.excel.ExcelColumnName;
 import com.riozenc.quicktool.common.util.StringUtils;
+import com.riozenc.quicktool.common.util.annotation.AnnotationUtil;
 import com.riozenc.quicktool.common.util.reflect.ReflectUtil;
 
 /**
@@ -35,9 +37,10 @@ import com.riozenc.quicktool.common.util.reflect.ReflectUtil;
 public class ExcelUtil {
 
 	public static <T> List<T> parse(File file, Class<T> clazz) {
-		List<String> columnNames = new ArrayList<String>();
+		String[] columnNames = null;
 		List<T> list = new ArrayList<>();
 		Field[] fields = clazz.getDeclaredFields();
+		boolean isColumn = true;
 		try {
 			Workbook wb = null;
 			if (isExcel2003(file.getName())) {
@@ -54,37 +57,46 @@ public class ExcelUtil {
 				if (sheet == null) {
 					continue;
 				}
+
+				row = sheet.getRow(0);
+				columnNames = new String[row.getLastCellNum()];
+				for (int cellNum = 0; cellNum < columnNames.length; cellNum++) {
+					cell = row.getCell(cellNum);
+					columnNames[cellNum] = cell == null ? null : getValue(cell);// 获取字段
+				}
+
+				T t = null;
 				// 循环行Row
-				for (int rowNum = 0; rowNum <= sheet.getLastRowNum(); rowNum++) {
+				for (int rowNum = 1; rowNum <= sheet.getLastRowNum(); rowNum++) {
 					row = sheet.getRow(rowNum);
 					if (row == null) {
 						continue;
 					}
+					t = clazz.newInstance();
 					// 循环列Cell
-					for (int cellNum = 0; cellNum <= row.getLastCellNum(); cellNum++) {
+					for (int cellNum = 0; cellNum < columnNames.length; cellNum++) {
 						cell = row.getCell(cellNum);
 						if (cell == null) {
 							continue;
 						}
-						if (rowNum == 0) {
-							columnNames.add(getValue(cell));// 获取字段
-						} else {
-							// 拼装对象
-							if (columnNames.size() > 0) {
-								T t = clazz.newInstance();
-								for (String temp : columnNames) {
-									for (Field field : fields) {
-										if (field.getName().equals(StringUtils.h2s(temp))) {
-											ReflectUtil.setFieldValue(t, field.getName(), getValue(cell));
-										}
-									}
+						// 拼装对象
+						for (Field field : fields) {
+							if (field.getAnnotation(ExcelColumnName.class) != null) {
+								Object temp = AnnotationUtil.getAnnotationValue(field, ExcelColumnName.class, "value");
+								if (temp != null && temp.equals(StringUtils.h2s(columnNames[cellNum]))) {
+									ReflectUtil.setFieldValue(t, field.getName(), getValue(cell));
+									break;
 								}
-								list.add(t);
+							}
+
+							if (field.getName().equals(StringUtils.h2s(columnNames[cellNum]))) {
+								ReflectUtil.setFieldValue(t, field.getName(), getValue(cell));
+								break;
 							}
 						}
-
 					}
-
+					if (t != null)
+						list.add(t);
 				}
 			}
 			return list;

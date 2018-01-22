@@ -7,6 +7,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+/**
+ * 表 映射 对象
+ * 
+ * @author riozenc
+ *
+ */
 public class SqlToObjectFactory {
 
 	private String driver = null;
@@ -21,7 +27,7 @@ public class SqlToObjectFactory {
 		this.url = url;
 	}
 
-	public List<?> covert(String sql, Class<?> clazz) {
+	public <T> List<T> covert(String sql, Class<T> clazz) {
 
 		Connection connection = getConnection();
 
@@ -58,14 +64,10 @@ public class SqlToObjectFactory {
 		Connection connection = null;
 		try {
 			Class.forName(driver);
-
+			connection = DriverManager.getConnection(url, userName, password);
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-
-		try {
-			connection = DriverManager.getConnection(url, userName, password);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -74,7 +76,7 @@ public class SqlToObjectFactory {
 		return connection;
 	}
 
-	private List<?> convert(final ResultSet resultSet, final Class<?> clazz) {
+	private <T> List<T> convert(final ResultSet resultSet, final Class<T> clazz) {
 		return ResultSetCaseUtil.change(resultSet, clazz);
 	}
 
