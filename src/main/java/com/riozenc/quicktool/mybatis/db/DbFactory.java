@@ -12,12 +12,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.ibatis.datasource.pooled.PooledDataSource;
-import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.reflection.ReflectionException;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -30,6 +27,7 @@ import com.riozenc.quicktool.common.util.reflect.ReflectUtil;
 import com.riozenc.quicktool.config.Global;
 import com.riozenc.quicktool.exception.DbInitException;
 import com.riozenc.quicktool.mybatis.MybatisEntity;
+import com.riozenc.quicktool.mybatis.db.pool.druid.DruidDataSource;
 import com.riozenc.quicktool.springmvc.context.SpringContextHolder;
 
 public class DbFactory {
@@ -115,26 +113,23 @@ public class DbFactory {
 		String[] dbs = db.split(",");
 		for (String temp : dbs) {
 			SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
-			PooledDataSource pooledDataSource = new PooledDataSource();
+			DruidDataSource dataSource = new DruidDataSource();
 
 			if (Global.getConfig("db.autoCommit").equals("false")) {
-				pooledDataSource.setDefaultAutoCommit(false);// 设置连接默认不自动提交
+
+				dataSource.setDefaultAutoCommit(false);// 设置连接默认不自动提交
 			}
 
 			for (Entry<String, String> entry : Global.getConfigs(temp).entrySet()) {
 				try {
-
-					// ReflectUtil.setFieldValue(pooledDataSource,
-					// getParam(entry.getKey()), entry.getValue());
-					ReflectUtil.setValue(pooledDataSource, getParam(entry.getKey()), entry.getValue());
-
+					ReflectUtil.setValue(dataSource, getParam(entry.getKey()), entry.getValue());
 				} catch (Exception e) {
 					LOGGER.info(getParam(entry.getKey()) + "属性存在问题,无该属性或对应set/get方法存在异常...尝试强制赋值.");
 					e.initCause(new ReflectionException(
 							getParam(entry.getKey()) + "属性存在问题,无该属性或对应set/get方法存在异常...尝试强制赋值."));
 					// 强制赋值
 					try {
-						ReflectUtil.setFieldValue(pooledDataSource, getParam(entry.getKey()), entry.getValue());
+						ReflectUtil.setFieldValue(dataSource, getParam(entry.getKey()), entry.getValue());
 					} catch (Exception e1) {
 						LOGGER.info(getParam(entry.getKey()) + "不是正确的属性...强制赋值失败");
 						e1.initCause(new ReflectionException(getParam(entry.getKey()) + "不是正确的属性...强制赋值失败"));
@@ -142,15 +137,24 @@ public class DbFactory {
 				}
 			}
 
-			factoryBean.setDataSource(pooledDataSource);
+			factoryBean.setDataSource(dataSource);
 			factoryBean.setTypeAliasesPackage(Global.getConfig("namespace"));
 			factoryBean.setTypeAliasesSuperType(MybatisEntity.class);
 
 			try {
 				factoryBean.setMapperLocations(new PathMatchingResourcePatternResolver()
 						.getResources("classpath:/" + Global.getConfig("namespace") + "/webapp/**/*.xml"));
+
 				factoryBean.setConfigLocation(
 						new PathMatchingResourcePatternResolver().getResource("classpath:mybatis-config.xml"));
+
+				// Configuration configuration = new Configuration();
+				// configuration.setLazyLoadingEnabled(true);
+				// configuration.setMapUnderscoreToCamelCase(true);
+				// configuration.setCacheEnabled(true);
+				// configuration.setLogImpl(Log4j2Impl.class);
+				// configuration.setJdbcTypeForNull(JdbcType.NULL);
+				// factoryBean.setConfiguration(configuration);
 
 				putDB(temp, factoryBean.getObject());
 			} catch (IOException e) {
@@ -163,25 +167,6 @@ public class DbFactory {
 
 		}
 
-	}
-
-	/**
-	 * 初始化mybatis配置文件数据源
-	 */
-	public static void initByMybatis() {
-		try {
-			reader = Resources.getResourceAsReader(resource);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			LogUtil.getLogger(LOG_TYPE.DB).error("读取配置文件失败...");
-		}
-		sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader, "gy_jl");
-
-		FLAG = checkSqlSessionFactory(sqlSessionFactory);
-		if (!FLAG) {
-			LogUtil.getLogger(LOG_TYPE.DB).info("数据库完成初始化...");
-		}
 	}
 
 	private static void putDB(String key, SqlSessionFactory sessionFactory) {

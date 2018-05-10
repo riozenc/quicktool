@@ -3,7 +3,7 @@ package com.riozenc.quicktool.mybatis.persistence;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.riozenc.quicktool.config.Global;
 
-public class Page<T> {
+public class Page {
 	@JsonIgnore
 	private int totalRow;// 总条数
 	@JsonIgnore

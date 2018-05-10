@@ -48,38 +48,23 @@ public class DAOProxyFactory implements MethodInterceptor {
 		// TODO Auto-generated method stub
 		String methodName = method.getName();
 		try {
-
 			Object rev = method.invoke(persistanceManager, args);
-
-			// LOGGER.info(DateUtil.formatDateTime(new Date()) + "===" + "对" +
-			// args[0] + "进行了" + methodName + "操作");
-
-			// 提交
-//			long l = System.currentTimeMillis();
 			persistanceManager.getSession().commit(true);
-
-			// LOGGER.info(DateUtil.formatDateTime(new Date()) + args[0] + "的" +
-			// methodName + "操作最终提交耗时:"
-			// + (System.currentTimeMillis() - l));
 			return rev;
 		} catch (Exception e) {
 			// 回滚
 			persistanceManager.getSession().rollback(true);
-
 			LOGGER.error("失败..." + args[0] + "的" + methodName + "操作被回滚...\r\n" + e.getMessage());
-
 			for (Object bad : persistanceManager.getBadList()) {
 				LOGGER.error("错误数据:" + ObjectToStringUtil.execute(bad));
 			}
 			e.printStackTrace();
-			
 			LogUtil.getLogger(LOG_TYPE.ERROR).error(ExceptionLogUtil.log(e));
 			return null;
 		} finally {
 			// 最终处理
 			persistanceManager.getSession().close();
 		}
-
 	}
 
 }

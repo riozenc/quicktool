@@ -27,10 +27,6 @@ public class ClassCache {
 	private static Logger LOGGER = LogManager.getLogger(ClassCache.class);
 
 	private static Map<Class<?>, ClassEntity> map = new ConcurrentHashMap<Class<?>, ClassEntity>();
-	// private static final String PACKAGE_NAME =
-	// "com.wisdom.gy.interactionMarketing.msgbox.entity";
-	// private static final String PACKAGE_NAME =
-	// "com.wisdom.gy.interactionMarketing.entity";
 	private static final String PACKAGE_NAME = "com.wisdom.gy.interactionMarketing.app.domain";
 	private static boolean isInit = false;
 

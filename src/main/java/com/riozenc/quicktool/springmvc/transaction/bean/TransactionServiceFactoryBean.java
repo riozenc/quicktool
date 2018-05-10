@@ -106,8 +106,4 @@ public class TransactionServiceFactoryBean<T> implements FactoryBean<T> {
 		return null;
 	}
 
-	public static void main(String[] args) {
-		String s = "UserDAO";
-		System.out.println(StringUtils.decapitalize(s));
-	}
 }

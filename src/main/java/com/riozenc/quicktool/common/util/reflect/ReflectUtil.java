@@ -113,6 +113,8 @@ public class ReflectUtil {
 	 */
 	public static Method getAccessibleMethod(final Object obj, final String fieldName,
 			final MethodGen.METHOD_TYPE methodType, final Class<?>... parameterTypes) {
+
+		Method method = null;
 		if (null == obj) {
 			throw new RuntimeException("object can't be null");
 		}
@@ -127,11 +129,9 @@ public class ReflectUtil {
 		for (Class<?> superClass = obj.getClass(); superClass != Object.class; superClass = superClass
 				.getSuperclass()) {
 			try {
-
-				superClass.getMethods();
-
-				Method method = superClass.getDeclaredMethod(MethodGen.generateMethodName(methodType, fieldName),
+				method = superClass.getDeclaredMethod(MethodGen.generateMethodName(methodType, fieldName),
 						parameterTypes);
+				System.out.println(method);
 				makeAccessible(method);
 				return method;
 			} catch (NoSuchMethodException e) {// NOSONAR
@@ -139,7 +139,8 @@ public class ReflectUtil {
 				continue;// new add
 			}
 		}
-		return null;
+
+		return method;
 	}
 
 	/**

@@ -20,12 +20,6 @@ import com.riozenc.quicktool.common.util.StringUtils;
  */
 public class ResultSetCaseUtil {
 
-	
-
-	public static void main(String[] args) {
-		System.out.println(StringUtils.h2s("qysx_id"));
-	}
-
 	/**
 	 * 100w次转换需要30秒
 	 * 
@@ -106,4 +100,5 @@ public class ResultSetCaseUtil {
 
 		return list;
 	}
+
 }

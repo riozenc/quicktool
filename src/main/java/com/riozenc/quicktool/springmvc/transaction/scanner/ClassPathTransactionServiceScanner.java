@@ -133,7 +133,7 @@ public class ClassPathTransactionServiceScanner extends ClassPathBeanDefinitionS
 			beanDefinition.setBeanClass(this.transactionServiceFactoryBean.getClass());
 
 			boolean explicitFactoryUsed = false;
-
+		
 			if (!explicitFactoryUsed) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Enabling autowire by type for MapperFactoryBean with name '" + holder.getBeanName()

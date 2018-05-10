@@ -22,16 +22,13 @@ public abstract class AbstractDAOSupport {
 	private ExecutorType executorType = ExecutorType.SIMPLE;
 	private boolean isProxy = false;
 	private boolean autoCommit = false;
-	// private SqlSession sqlSession = null;
-	// private Set<SqlSession> sqlSessions = new HashSet<SqlSession>();
 	private String dbName = null;
 	private String NAMESPACE = null;
 
 	private ThreadLocal<Map<String, SqlSession>> localSqlSessionMap = new ThreadLocal<>();
 
 	public AbstractDAOSupport() {
-		System.out.println(Thread.currentThread().getName() + "创建AbstractDAOSupport(" + this + ")" + "["
-				+ this.getClass().getName() + "]");
+		//System.out.println(Thread.currentThread().getName() + "创建AbstractDAOSupport(" + this + ")" + "["+ this.getClass().getName() + "]");
 	}
 
 	protected PersistanceManager getPersistanceManager() {

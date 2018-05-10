@@ -98,7 +98,7 @@ public abstract class AbstractPasswordShiroRealm extends AuthorizingRealm {
 			hashIterations = getHashIterations();
 
 		HashedCredentialsMatcher matcher = new HashedCredentialsMatcher(hashAlgorithmName);
-		matcher.setHashIterations(hashIterations);// 迭代1024次
+		matcher.setHashIterations(hashIterations);
 		setCredentialsMatcher(matcher);
 
 		LogUtil.getLogger(LOG_TYPE.MAIN).info(

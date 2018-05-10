@@ -18,7 +18,7 @@ public class JSONGrid {
 		this.list = list;
 	}
 
-	public JSONGrid(Page<?> page, Object list) {
+	public JSONGrid(Page page, Object list) {
 		this.totalRow = page.getTotalRow();
 		this.pageCurrent = page.getPageCurrent();
 		this.list = list;

@@ -53,7 +53,7 @@ public class LogUtil {
 	}
 
 	public enum LOG_TYPE {
-		DB, IO, ERROR, OTHER, WEBSERVICE, CACHE, MAIN
+		DB, IO, ERROR, OTHER, WEBSERVICE, CACHE, MAIN,REQUEST
 	}
 
 	public enum LOG_OUT_TYPE {

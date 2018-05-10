@@ -61,13 +61,13 @@ public abstract class BaseInterceptor implements Interceptor, Serializable {
 	 * @throws NoSuchFieldException
 	 *             无法找到参数
 	 */
-	@SuppressWarnings("unchecked")
-	protected static Page<Object> convertParameter(Object parameterObject, Page<Object> page) {
+
+	protected static Page convertParameter(Object parameterObject, Page page) {
 		try {
 			if (parameterObject instanceof Page) {
-				return (Page<Object>) parameterObject;
+				return (Page) parameterObject;
 			} else {
-				return (Page<Object>) ReflectUtil.getFieldValue(parameterObject, PAGE);
+				return (Page) ReflectUtil.getFieldValue(parameterObject, PAGE);
 			}
 		} catch (Exception e) {
 			return null;

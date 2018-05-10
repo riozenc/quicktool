@@ -211,7 +211,7 @@ public class SQLHelper {
 	 *            方言类型
 	 * @return 分页SQL
 	 */
-	public static String generatePageSql(String sql, Page<Object> page, Dialect dialect) {
+	public static String generatePageSql(String sql, Page page, Dialect dialect) {
 		if (dialect.supportsLimit()) {
 			return dialect.getLimitString(sql, page.getFirstResult(), page.getMaxResults());
 		} else {

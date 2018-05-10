@@ -38,7 +38,6 @@ public class TransactionServiceRegistryPostProcessor extends AbstractRegistryPos
 
 		ClassPathTransactionServiceScanner scanner = new ClassPathTransactionServiceScanner(registry);
 		scanner.setAnnotationClass(annotationClass);
-
 		scanner.registerFilters();
 		scanner.scan(StringUtils.tokenizeToStringArray(Global.getConfig(getNamespace()),
 				ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS));
