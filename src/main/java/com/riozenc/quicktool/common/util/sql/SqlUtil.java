@@ -100,8 +100,7 @@ public class SqlUtil {
 		sb.append(LEFT_BRACKET).append(columns).append(RIGHT_BRACKET);
 		sb.append(VALUES).append(LEFT_BRACKET);
 		sb.append(values).append(RIGHT_BRACKET);
-		System.out.println("SqlTools---------------------------------");
-		System.out.println(sb);
+
 		return sb.toString();
 	}
 

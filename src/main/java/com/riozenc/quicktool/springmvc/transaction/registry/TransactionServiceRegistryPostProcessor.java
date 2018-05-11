@@ -28,13 +28,13 @@ public class TransactionServiceRegistryPostProcessor extends AbstractRegistryPos
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		// TODO Auto-generated method stub
-		System.out.println("postProcessBeanFactory");
+		
 	}
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 		// TODO Auto-generated method stub
-		System.out.println("TransactionServiceRegistryPostProcessor.postProcessBeanDefinitionRegistry");
+		
 
 		ClassPathTransactionServiceScanner scanner = new ClassPathTransactionServiceScanner(registry);
 		scanner.setAnnotationClass(annotationClass);

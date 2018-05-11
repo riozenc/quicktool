@@ -131,7 +131,6 @@ public class ReflectUtil {
 			try {
 				method = superClass.getDeclaredMethod(MethodGen.generateMethodName(methodType, fieldName),
 						parameterTypes);
-				System.out.println(method);
 				makeAccessible(method);
 				return method;
 			} catch (NoSuchMethodException e) {// NOSONAR

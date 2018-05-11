@@ -24,7 +24,7 @@ public class ClassDAOXmlUtil {
 	public static String getInsert(Class<?> clazz) {
 		StringBuffer sb = new StringBuffer();
 
-//		Field[] fields = clazz.getDeclaredFields();
+		// Field[] fields = clazz.getDeclaredFields();
 		Field[] fields = ReflectUtil.getFields(clazz);
 
 		sb.append("(");
@@ -39,7 +39,7 @@ public class ClassDAOXmlUtil {
 	public static String getUpdate(Class<?> clazz) {
 		StringBuffer sb = new StringBuffer();
 
-//		Field[] fields = clazz.getDeclaredFields();
+		// Field[] fields = clazz.getDeclaredFields();
 		Field[] fields = ReflectUtil.getFields(clazz);
 
 		for (Field field : fields) {
@@ -53,21 +53,9 @@ public class ClassDAOXmlUtil {
 		return sb.toString();
 	}
 
-	public static void getFindByWhere(Class<?> clazz) {
-
-		Field[] fields = clazz.getDeclaredFields();
-
-		for (Field field : fields) {
-			System.out.println("<if test=\"" + field.getName() + " !=null\">");
-			System.out.println("and " + field.getName().toUpperCase() + " = #{" + field.getName() + "}");
-			System.out.println("</if>");
-
-		}
-	}
-
 	public static String getColumns(Class<?> clazz) {
 		StringBuffer sb = new StringBuffer();
-//		Field[] fields = clazz.getDeclaredFields();
+		// Field[] fields = clazz.getDeclaredFields();
 		Field[] fields = ReflectUtil.getFields(clazz);
 
 		for (Field field : fields) {

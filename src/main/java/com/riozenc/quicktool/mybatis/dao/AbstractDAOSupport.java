@@ -28,7 +28,7 @@ public abstract class AbstractDAOSupport {
 	private ThreadLocal<Map<String, SqlSession>> localSqlSessionMap = new ThreadLocal<>();
 
 	public AbstractDAOSupport() {
-		//System.out.println(Thread.currentThread().getName() + "创建AbstractDAOSupport(" + this + ")" + "["+ this.getClass().getName() + "]");
+		
 	}
 
 	protected PersistanceManager getPersistanceManager() {
