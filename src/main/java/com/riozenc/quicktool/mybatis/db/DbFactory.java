@@ -6,7 +6,6 @@
 
 package com.riozenc.quicktool.mybatis.db;
 
-import java.io.IOException;
 import java.io.Reader;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -107,8 +106,9 @@ public class DbFactory {
 
 	/**
 	 * 通过java代码实现初始化,name为config中的数据库名称
+	 * @throws Exception 
 	 */
-	public static void initByFactory() {
+	public static void initByFactory() throws Exception {
 		String db = Global.getConfig(DB);
 		String[] dbs = db.split(",");
 		for (String temp : dbs) {
@@ -141,29 +141,13 @@ public class DbFactory {
 			factoryBean.setTypeAliasesPackage(Global.getConfig("namespace"));
 			factoryBean.setTypeAliasesSuperType(MybatisEntity.class);
 
-			try {
-				factoryBean.setMapperLocations(new PathMatchingResourcePatternResolver()
-						.getResources("classpath:/" + Global.getConfig("namespace") + "/webapp/**/*.xml"));
+			factoryBean.setMapperLocations(new PathMatchingResourcePatternResolver()
+					.getResources("classpath:/" + Global.getConfig("namespace") + "/webapp/**/*.xml"));
 
-				factoryBean.setConfigLocation(
-						new PathMatchingResourcePatternResolver().getResource("classpath:mybatis-config.xml"));
+			factoryBean.setConfigLocation(
+					new PathMatchingResourcePatternResolver().getResource("classpath:mybatis-config.xml"));
 
-				// Configuration configuration = new Configuration();
-				// configuration.setLazyLoadingEnabled(true);
-				// configuration.setMapUnderscoreToCamelCase(true);
-				// configuration.setCacheEnabled(true);
-				// configuration.setLogImpl(Log4j2Impl.class);
-				// configuration.setJdbcTypeForNull(JdbcType.NULL);
-				// factoryBean.setConfiguration(configuration);
-
-				putDB(temp, factoryBean.getObject());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			putDB(temp, factoryBean.getObject());
 
 		}
 
