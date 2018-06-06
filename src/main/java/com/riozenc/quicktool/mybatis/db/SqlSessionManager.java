@@ -10,7 +10,7 @@ import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 
-import com.riozenc.quicktool.mybatis.db.DbFactory;
+import com.riozenc.quicktool.db.DataSourcePoolFactory;
 
 public class SqlSessionManager {
 	private static SqlSessionFactory sqlSessionFactory = null;
@@ -28,7 +28,7 @@ public class SqlSessionManager {
 	public static SqlSession getSession(String dbName, boolean autoCommit) {
 		synchronized (b) {
 			try {
-				return DbFactory.getSqlSessionFactory(dbName).openSession(autoCommit);
+				return DataSourcePoolFactory.getSqlSessionFactory(dbName).openSession(autoCommit);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -42,7 +42,7 @@ public class SqlSessionManager {
 	public static SqlSession getSession(ExecutorType executorType) {
 		if (null == sqlSessionFactory) {
 			synchronized (b) {
-				sqlSessionFactory = DbFactory.getSqlSessionFactory();
+				sqlSessionFactory = DataSourcePoolFactory.getSqlSessionFactory();
 			}
 		}
 		// 不自动提交
@@ -52,7 +52,7 @@ public class SqlSessionManager {
 	public static SqlSession getSession(ExecutorType executorType, boolean autoCommit) {
 		if (null == sqlSessionFactory) {
 			synchronized (b) {
-				sqlSessionFactory = DbFactory.getSqlSessionFactory();
+				sqlSessionFactory = DataSourcePoolFactory.getSqlSessionFactory();
 			}
 		}
 		// 不自动提交
@@ -63,7 +63,7 @@ public class SqlSessionManager {
 
 		synchronized (b) {
 			try {
-				return DbFactory.getSqlSessionFactory(dbName).openSession(executorType, false);
+				return DataSourcePoolFactory.getSqlSessionFactory(dbName).openSession(executorType, false);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

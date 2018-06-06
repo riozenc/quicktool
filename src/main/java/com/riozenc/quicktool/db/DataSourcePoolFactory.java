@@ -7,9 +7,9 @@ package com.riozenc.quicktool.db;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import org.apache.ibatis.reflection.ReflectionException;
+import javax.sql.DataSource;
+
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.logging.log4j.LogManager;
@@ -20,70 +20,67 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import com.riozenc.quicktool.common.util.log.ExceptionLogUtil;
 import com.riozenc.quicktool.common.util.log.LogUtil;
 import com.riozenc.quicktool.common.util.log.LogUtil.LOG_TYPE;
-import com.riozenc.quicktool.common.util.reflect.ReflectUtil;
 import com.riozenc.quicktool.config.Global;
+import com.riozenc.quicktool.exception.DbInitException;
 import com.riozenc.quicktool.mybatis.MybatisEntity;
-import com.riozenc.quicktool.mybatis.db.DbFactory;
-import com.riozenc.quicktool.mybatis.db.pool.druid.DruidDataSource;
 
 public class DataSourcePoolFactory {
-	private static final Logger LOGGER = LogManager.getLogger(DbFactory.class);
-	private static final String DB = "db";
+	private static final Logger LOGGER = LogManager.getLogger(DataSourcePoolFactory.class);
 	private static boolean FLAG = false;
 	private static String defaultDB = null;
 	private static SqlSessionFactory sqlSessionFactory;
 
 	private static Map<String, SqlSessionFactory> DBS = new LinkedHashMap<String, SqlSessionFactory>();
 
-	public void init() throws Exception {
+	public static SqlSessionFactory createFactory(String name, DataSource dataSource) throws Exception {
+		SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
+		factoryBean.setDataSource(dataSource);
+		factoryBean.setTypeAliasesPackage(Global.getConfig("namespace"));
+		factoryBean.setTypeAliasesSuperType(MybatisEntity.class);
+		factoryBean.setMapperLocations(new PathMatchingResourcePatternResolver()
+				.getResources("classpath:/" + Global.getConfig("namespace") + "/webapp/**/*.xml"));
+		factoryBean.setConfigLocation(
+				new PathMatchingResourcePatternResolver().getResource("classpath:mybatis-config.xml"));
 
-		String db = Global.getConfig(DB);
-		String[] dbs = db.split(",");
-		for (String temp : dbs) {
-			SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
-			DruidDataSource dataSource = new DruidDataSource();
+		putDB(name, factoryBean.getObject());
 
-			if (Global.getConfig("db.autoCommit").equals("false")) {
-
-				dataSource.setDefaultAutoCommit(false);// 设置连接默认不自动提交
-			}
-
-			for (Entry<String, String> entry : Global.getConfigs(temp).entrySet()) {
-				try {
-					ReflectUtil.setValue(dataSource, getParam(entry.getKey()), entry.getValue());
-				} catch (Exception e) {
-					LOGGER.info(getParam(entry.getKey()) + "属性存在问题,无该属性或对应set/get方法存在异常...尝试强制赋值.");
-					e.initCause(new ReflectionException(
-							getParam(entry.getKey()) + "属性存在问题,无该属性或对应set/get方法存在异常...尝试强制赋值."));
-					// 强制赋值
-					try {
-						ReflectUtil.setFieldValue(dataSource, getParam(entry.getKey()), entry.getValue());
-					} catch (Exception e1) {
-						LOGGER.info(getParam(entry.getKey()) + "不是正确的属性...强制赋值失败");
-						e1.initCause(new ReflectionException(getParam(entry.getKey()) + "不是正确的属性...强制赋值失败"));
-					}
-				}
-			}
-
-			factoryBean.setDataSource(dataSource);
-			factoryBean.setTypeAliasesPackage(Global.getConfig("namespace"));
-			factoryBean.setTypeAliasesSuperType(MybatisEntity.class);
-
-			factoryBean.setMapperLocations(new PathMatchingResourcePatternResolver()
-					.getResources("classpath:/" + Global.getConfig("namespace") + "/webapp/**/*.xml"));
-
-			factoryBean.setConfigLocation(
-					new PathMatchingResourcePatternResolver().getResource("classpath:mybatis-config.xml"));
-
-			putDB(temp, factoryBean.getObject());
-
-		}
-
+		return factoryBean.getObject();
 	}
 
 	private static void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
 		if (DataSourcePoolFactory.sqlSessionFactory == null) {
 			DataSourcePoolFactory.sqlSessionFactory = sqlSessionFactory;
+		}
+	}
+
+	/**
+	 * 获取默认数据库连接工厂,多数据源情况下取第一个
+	 * 
+	 * @return
+	 */
+	public static SqlSessionFactory getSqlSessionFactory() {
+		if (FLAG) {
+			return sqlSessionFactory;
+		} else {
+			throw new DbInitException("数据库未完成初始化...");
+		}
+	}
+
+	/**
+	 * 获取默认数据库连接工厂,根据name
+	 * 
+	 * @param name
+	 * @return
+	 * @throws Exception
+	 */
+	public static SqlSessionFactory getSqlSessionFactory(String name) throws Exception {
+		if (FLAG) {
+			if (null == name || "".equals(name)) {
+				name = defaultDB;
+			}
+			return DBS.get(name);
+		} else {
+			throw new DbInitException("数据库未完成初始化...");
 		}
 	}
 
@@ -93,6 +90,9 @@ public class DataSourcePoolFactory {
 		}
 		DBS.put(key, sessionFactory);
 		FLAG = checkSqlSessionFactory(DBS.get(key));
+		if (FLAG) {
+			LOGGER.info(key + " 数据库创建成功...");
+		}
 	}
 
 	/**
@@ -121,13 +121,4 @@ public class DataSourcePoolFactory {
 		}
 	}
 
-	/**
-	 * eg: xxx.aaa ——> aaa eg: xxx.aaa.bbb.ccc ——> ccc
-	 * 
-	 * @param param
-	 * @return
-	 */
-	private static String getParam(String param) {
-		return param.substring(param.lastIndexOf(".") + 1);
-	}
 }
