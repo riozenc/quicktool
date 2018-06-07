@@ -16,16 +16,24 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.riozenc.quicktool.beanvalidator.BeanValidators;
 import com.riozenc.quicktool.common.util.date.DateUtil;
 import com.riozenc.quicktool.common.util.json.JSONUtil;
 
-public class BaseAction {
+public abstract class BaseAction {
 
 	protected Logger logger = LogManager.getLogger(getClass());
 
 	private Validator validator;
+
+	@RequestMapping(params = "method=index")
+	public String index() {
+		return getIndex();
+	}
+
+	public abstract String getIndex();
 
 	/**
 	 * 应用到所有@RequestMapping注解方法，在其执行之前把返回值放入Model
