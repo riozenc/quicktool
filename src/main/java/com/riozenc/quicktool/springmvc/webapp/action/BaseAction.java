@@ -15,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.riozenc.quicktool.beanvalidator.BeanValidators;
@@ -35,24 +34,9 @@ public abstract class BaseAction {
 
 	public abstract String getIndex();
 
-	/**
-	 * 应用到所有@RequestMapping注解方法，在其执行之前把返回值放入Model
-	 * 
-	 * @return
-	 */
-	@ModelAttribute
-	public String initModel() {
-		String czy = "czy";
-		return czy;
-	}
-
-	/**
-	 * 初始化数据绑定 1. 将所有传递进来的String进行HTML编码，防止XSS攻击 2. 将字段中Date类型转换为String类型
-	 */
 	@InitBinder
 	public void initBinder(WebDataBinder binder) {
-		System.out.println("============应用到所有@RequestMapping注解方法，在其执行之前初始化数据绑定器");
-
+		System.out.println("======");
 		// String类型转换，将所有传递进来的String进行HTML编码，防止XSS攻击
 		binder.registerCustomEditor(String.class, new PropertyEditorSupport() {
 			@Override
