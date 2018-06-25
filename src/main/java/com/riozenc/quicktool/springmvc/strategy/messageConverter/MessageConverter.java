@@ -22,6 +22,7 @@ import com.riozenc.quicktool.common.util.json.JSONUtil;
 import com.riozenc.quicktool.common.util.xml.XmlUtils;
 
 public class MessageConverter extends AbstractHttpMessageConverter<Object> {
+
 	public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
 	public MessageConverter() {
@@ -66,17 +67,24 @@ public class MessageConverter extends AbstractHttpMessageConverter<Object> {
 			throws IOException, HttpMessageNotWritableException {
 		// TODO Auto-generated method stub
 		Charset charset = getContentTypeCharset(outputMessage.getHeaders().getContentType());
+		String message = null;
 		if (outputMessage.getHeaders().getContentType().isCompatibleWith(MediaType.APPLICATION_JSON_UTF8)) {
 			// json
-			StreamUtils.copy(JSONUtil.toJsonString(t), charset, outputMessage.getBody());
+			message = JSONUtil.toJsonString(t);
 		} else if (outputMessage.getHeaders().getContentType().isCompatibleWith(MediaType.APPLICATION_XML)) {
 			// xml
-			StreamUtils.copy(XmlUtils.object2xml(t), charset, outputMessage.getBody());
+			message = XmlUtils.object2xml(t);
 		} else if (t.getClass() == String.class) {
 			StreamUtils.copy((String) t, charset, outputMessage.getBody());
+			message = (String) t;
 		} else {
-			StreamUtils.copy("未知格式数据..", charset, outputMessage.getBody());
+			message = "未知格式数据..";
 		}
+
+		if (logger.isDebugEnabled()) {
+			logger.info(t.getClass() + " converter ===>>>" + message);
+		}
+		StreamUtils.copy(message, charset, outputMessage.getBody());
 
 	}
 
