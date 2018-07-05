@@ -15,22 +15,38 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.riozenc.quicktool.annotation.ReflectionIgnore;
 import com.riozenc.quicktool.common.util.date.DateUtil;
+import com.riozenc.quicktool.common.util.log.ExceptionLogUtil;
 import com.riozenc.quicktool.common.util.reflect.MethodGen.METHOD_TYPE;
 
 public class ReflectUtil {
+
+	private static Logger LOGGER = LoggerFactory.getLogger(ReflectUtil.class);
 
 	/**
 	 * 获取指定CLASS的属性,包括上级类
 	 * 
 	 * @param clazz
-	 * @return
+	 * @return Field[]
 	 */
 	public static Field[] getFields(Class<?> clazz) {
+		List<Field> list = getFieldList(clazz);
+		return list.toArray(new Field[list.size()]);
+	}
+
+	/**
+	 * 获取指定CLASS的属性,包括上级类
+	 * 
+	 * @param clazz
+	 * @return List<Field>
+	 */
+	public static List<Field> getFieldList(Class<?> clazz) {
 		LinkedList<Field> list = new LinkedList<>();
 		for (Class<?> superClass = clazz; superClass != Object.class; superClass = superClass.getSuperclass()) {
 			Field[] fields = superClass.getDeclaredFields();
@@ -40,7 +56,7 @@ public class ReflectUtil {
 				}
 			}
 		}
-		return list.toArray(new Field[0]);
+		return list;
 	}
 
 	/**
@@ -213,20 +229,13 @@ public class ReflectUtil {
 		Object result = null;
 		Method method = null;
 		try {
-
 			method = obj.getClass().getDeclaredMethod(methodName, null);
 			result = method.invoke(obj, new Object[] {});
 
-		} catch (IllegalAccessException ex) {
-			Logger.getLogger(ReflectUtil.class.getName()).log(Level.SEVERE, null, ex);
-		} catch (IllegalArgumentException ex) {
-			Logger.getLogger(ReflectUtil.class.getName()).log(Level.SEVERE, null, ex);
-		} catch (InvocationTargetException ex) {
-			Logger.getLogger(ReflectUtil.class.getName()).log(Level.SEVERE, null, ex);
-		} catch (NoSuchMethodException ex) {
-			Logger.getLogger(ReflectUtil.class.getName()).log(Level.SEVERE, null, ex);
-		} catch (SecurityException ex) {
-			Logger.getLogger(ReflectUtil.class.getName()).log(Level.SEVERE, null, ex);
+		} catch (Exception ex) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.error(ExceptionLogUtil.log(ex));
+			}
 		}
 		return result;
 
@@ -336,6 +345,51 @@ public class ReflectUtil {
 				throw new Exception("没有匹配的类型:" + clazz.getName());
 			}
 		}
+	}
+
+	public static <T, F> List<T> cast(List<F> list, Class<T> tarClazz) {
+		List<T> result = new LinkedList<>();
+		if (null != list && list.size() > 0) {
+			for (F obj : list) {
+				result.add(cast(obj, tarClazz));
+			}
+		}
+		return result;
+	}
+
+	public static <T> T cast(Object srcObj, Class<T> tarClazz) {
+		T tarObj = null;
+		if (null != srcObj) {
+			try {
+				tarObj = tarClazz.newInstance();
+				Class<?> srcClazz = srcObj.getClass();
+
+				List<Field> srcFieldList = ReflectUtil.getFieldList(srcClazz);
+				List<Field> tarFieldList = ReflectUtil.getFieldList(tarClazz);
+
+				for (Field sField : tarFieldList) {
+					for (Field tField : srcFieldList) {
+						if (sField.getName().equals(tField.getName())) {
+							ReflectUtil.setFieldValue(tarObj, tField.getName(),
+									ReflectUtil.getFieldValue(srcObj, sField.getName()));
+						}
+					}
+				}
+
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		} else {
+			LOGGER.info("未查询到数据....");
+
+		}
+		return tarObj;
+
 	}
 
 }

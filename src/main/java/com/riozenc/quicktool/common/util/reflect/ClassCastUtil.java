@@ -7,54 +7,32 @@
  */
 package com.riozenc.quicktool.common.util.reflect;
 
-import java.lang.reflect.AccessibleObject;
+
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import com.riozenc.quicktool.common.util.StringUtils;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+@Deprecated
 public class ClassCastUtil {
 
-	private static final Logger LOGGER = LogManager.getLogger(ClassCastUtil.class);
+	private static Logger log = LoggerFactory.getLogger(ClassCastUtil.class);
 
-	// public static Object xx(Object srcObj, Class<?> tarClazz){
-	// Object obj=null;
-	// if(srcObj instanceof Collection){
-	// Collection<?> collection = (Collection<?>) srcObj;
-	// Iterator<?> iterator = collection.iterator();
-	// List<Object> result = new LinkedList<Object>();
-	// while(iterator.hasNext()){
-	// Object o = iterator.next();
-	// result.add(cast(o,tarClazz));
-	// }
-	// obj = result;
-	// }else{
-	// obj = cast(srcObj,tarClazz);
-	//
-	// }
-	// return obj;
-	// }
-	public static Object cast(Object srcObj, Class<?> tarClazz) {
-		// StringBuffer sb = new StringBuffer();
-		Object tarObj = null;
+	public static <T> T cast(Object srcObj, Class<T> tarClazz) {
+		
+		T tarObj = null;
 		if (null != srcObj) {
 			try {
-				Class<? extends Object> srcClazz = srcObj.getClass();
+				Class<?> srcClazz = srcObj.getClass();
 				tarObj = tarClazz.newInstance();
-				Field[] srcFields = srcClazz.getDeclaredFields();
-				Field[] tarFields = tarClazz.getDeclaredFields();
-				AccessibleObject.setAccessible(srcFields, true);
-				AccessibleObject.setAccessible(tarFields, true);
+				Field[] srcFields = ReflectUtil.getFields(srcClazz);
+				Field[] tarFields = ReflectUtil.getFields(tarClazz);
 
 				String srcFieldName = null;
 				String tarFieldName = null;
-				Class<? extends Object> tarFieldType = null;
+				Class<?> tarFieldType = null;
 				String upperName = null;
 
 				Method method;
@@ -68,18 +46,17 @@ public class ClassCastUtil {
 						srcFieldName = srcField.getName();
 
 						if (tarFieldName.equals(srcFieldName)) {
-							upperName = StringUtils.fristToUpper(tarFieldName);
-
-							tarFieldType = tarField.getType();
-							method = srcClazz.getDeclaredMethod("get" + upperName, null);
-							result = method.invoke(srcObj, new Object[] {});
-							result = ReflectUtil.typeFormat(tarFieldType, result);
-							method = tarClazz.getMethod("set" + upperName, new Class[] { tarFieldType });
-							method.invoke(tarObj, new Object[] { result });
-							// sb.append(tarFieldName)
-							// .append("=")
-							// .append(result == null ? "null" : result
-							// .toString()).append(",");
+							
+							ReflectUtil.setFieldValue(tarObj, tarFieldName, ReflectUtil.getFieldValue(srcObj, srcFieldName));
+							
+							
+//							upperName = StringUtils.fristToUpper(tarFieldName);
+//							tarFieldType = tarField.getType();
+//							method = srcClazz.getDeclaredMethod("get" + upperName, null);
+//							result = method.invoke(srcObj, new Object[] {});
+//							result = ReflectUtil.typeFormat(tarFieldType, result);
+//							method = tarClazz.getMethod("set" + upperName, new Class[] { tarFieldType });
+//							method.invoke(tarObj, new Object[] { result });
 							break;
 						}
 
@@ -96,31 +73,34 @@ public class ClassCastUtil {
 			} catch (SecurityException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} catch (NoSuchMethodException e) {
+			} 
+//			catch (NoSuchMethodException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} 
+			catch (IllegalArgumentException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (Exception e) {
+			} 
+//			catch (InvocationTargetException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+			catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else {
-			LOGGER.info("未查询到数据....");
+			log.info("未查询到数据....");
 		}
 
 		return tarObj;
 	}
 
-	public static <T> List<?> cast(List<?> list, Class<?> tarClazz) {
-
-		List<Object> result = new LinkedList<Object>();
+	public static <T, F> List<T> cast(List<F> list, Class<T> tarClazz) {
+		List<T> result = new LinkedList<>();
 		if (null != list && list.size() > 0) {
-			for (Object obj : list) {
+			for (F obj : list) {
 				result.add(cast(obj, tarClazz));
 			}
 		}

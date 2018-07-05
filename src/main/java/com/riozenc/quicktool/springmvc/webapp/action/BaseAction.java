@@ -36,7 +36,6 @@ public abstract class BaseAction {
 
 	@InitBinder
 	public void initBinder(WebDataBinder binder) {
-		System.out.println("======");
 		// String类型转换，将所有传递进来的String进行HTML编码，防止XSS攻击
 		binder.registerCustomEditor(String.class, new PropertyEditorSupport() {
 			@Override
