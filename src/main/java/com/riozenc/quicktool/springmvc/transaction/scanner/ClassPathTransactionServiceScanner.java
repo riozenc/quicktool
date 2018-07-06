@@ -30,7 +30,7 @@ public class ClassPathTransactionServiceScanner extends ClassPathBeanDefinitionS
 	public static final String RIOZENC = "RIOZENC_";
 	private Class<? extends Annotation> annotationClass;
 	private Class<?> transactionServiceInterface;
-	private TransactionServiceFactoryBean<?> transactionServiceFactoryBean = new TransactionServiceFactoryBean<Object>();
+//	private TransactionServiceFactoryBean<?> transactionServiceFactoryBean = new TransactionServiceFactoryBean<Object>();
 	private Set<BeanDefinitionHolder> factoryBeanBeanDefinitionSet = new HashSet<BeanDefinitionHolder>();
 
 	public ClassPathTransactionServiceScanner(BeanDefinitionRegistry registry) {
@@ -130,7 +130,7 @@ public class ClassPathTransactionServiceScanner extends ClassPathBeanDefinitionS
 				// TODO Auto-generated catch block
 				logger.debug(beanDefinition.getBeanClassName() + "is Not Found");
 			}
-			beanDefinition.setBeanClass(this.transactionServiceFactoryBean.getClass());
+			beanDefinition.setBeanClass(TransactionServiceFactoryBean.class);
 
 			boolean explicitFactoryUsed = false;
 		

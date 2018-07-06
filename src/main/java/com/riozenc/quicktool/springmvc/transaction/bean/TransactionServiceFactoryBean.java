@@ -5,25 +5,36 @@
  */
 package com.riozenc.quicktool.springmvc.transaction.bean;
 
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
+import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.context.annotation.CommonAnnotationBeanPostProcessor;
 
 import com.riozenc.quicktool.annotation.TransactionDAO;
-import com.riozenc.quicktool.common.util.ClassUtils;
 import com.riozenc.quicktool.common.util.StringUtils;
 import com.riozenc.quicktool.common.util.annotation.AnnotationUtil;
 import com.riozenc.quicktool.common.util.reflect.ReflectUtil;
 import com.riozenc.quicktool.mybatis.dao.AbstractTransactionDAOSupport;
+import com.riozenc.quicktool.springmvc.context.SpringContextHolder;
 import com.riozenc.quicktool.springmvc.transaction.proxy.TransactionServiceProxyFactory2;
 
 public class TransactionServiceFactoryBean<T> implements FactoryBean<T> {
 
+	@Autowired
+	private CommonAnnotationBeanPostProcessor commonAnnotationBeanPostProcessor;
 	private static Map<String, BeanDefinitionHolder> definitionHolderMap = new ConcurrentHashMap<>();
 	private Class<T> serviceInterface;
 
@@ -72,10 +83,16 @@ public class TransactionServiceFactoryBean<T> implements FactoryBean<T> {
 	private T build() throws Exception {
 		T service = this.serviceInterface.newInstance();
 		Field[] fields = this.serviceInterface.getDeclaredFields();
-		for (Field dao : fields) {
-			if (null != dao.getAnnotation(TransactionDAO.class)) {
-				ReflectUtil.setFieldValue(service, dao.getName(), processTransactionDAO(dao));// 给service赋值dao
+		for (Field field : fields) {
+			if (null != field.getAnnotation(TransactionDAO.class)) {
+				ReflectUtil.setFieldValue(service, field.getName(), processTransactionDAO(field));// 给service赋值dao
 			}
+			if (null != field.getAnnotation(Autowired.class)) {
+				BeanWrapper bw = new BeanWrapperImpl(service);
+				commonAnnotationBeanPostProcessor.postProcessPropertyValues(new MutablePropertyValues(), null,
+						bw.getWrappedInstance(), field.getName());
+			}
+
 		}
 		return service;
 	}
@@ -89,11 +106,7 @@ public class TransactionServiceFactoryBean<T> implements FactoryBean<T> {
 				throw new Exception(dao.getType() + " is not found @TransactionDAO!");
 			}
 			AbstractTransactionDAOSupport abstractDAOSupport = (AbstractTransactionDAOSupport) BeanUtils
-					.instantiate(dao.getType());
-//			Field sqlSessionField = ClassUtils.getField(dao.getType(), SqlSession.class);
-//			if (sqlSessionField == null) {
-//				throw new Exception(dao.getName() + " is not found AbstractTransactionDAOSupport support!");
-//			}
+					.instantiateClass(dao.getType());
 
 			String dbName = (String) AnnotationUtil.getAnnotationValue(dao, TransactionDAO.class);
 			if (dbName.length() < 1) {
