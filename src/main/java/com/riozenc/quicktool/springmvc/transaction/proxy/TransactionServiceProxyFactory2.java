@@ -17,6 +17,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.riozenc.quicktool.annotation.TransactionDAO;
 import com.riozenc.quicktool.common.util.date.DateUtil;
 import com.riozenc.quicktool.common.util.log.ExceptionLogUtil;
 import com.riozenc.quicktool.common.util.log.LogUtil;
@@ -109,14 +110,17 @@ public class TransactionServiceProxyFactory2 implements MethodInterceptor {
 	private void recovery() {
 		// targetObject;
 		Field[] fields = this.clazz.getDeclaredFields();
-		for (Field dao : fields) {
-			AbstractDAOSupport abstractDAOSupport = (AbstractDAOSupport) ReflectUtil.getFieldValue(targetObject,
-					dao.getName());
 
-			for (SqlSession sqlSession : abstractDAOSupport.getSqlSessions()) {
-				close(getSqlSessionMap().put(sqlSession.hashCode(), sqlSession));
+		for (Field field : fields) {
+			if (null != field.getAnnotation(TransactionDAO.class)) {
+				AbstractDAOSupport abstractDAOSupport = (AbstractDAOSupport) ReflectUtil.getFieldValue(targetObject,
+						field.getName());
+
+				for (SqlSession sqlSession : abstractDAOSupport.getSqlSessions()) {
+					close(getSqlSessionMap().put(sqlSession.hashCode(), sqlSession));
+				}
+				abstractDAOSupport.getSqlSessions().clear();
 			}
-			abstractDAOSupport.getSqlSessions().clear();
 		}
 	}
 
