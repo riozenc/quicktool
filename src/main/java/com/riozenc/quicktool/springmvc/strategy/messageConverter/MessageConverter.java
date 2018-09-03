@@ -75,7 +75,6 @@ public class MessageConverter extends AbstractHttpMessageConverter<Object> {
 			// xml
 			message = XmlUtils.object2xml(t);
 		} else if (t.getClass() == String.class) {
-			StreamUtils.copy((String) t, charset, outputMessage.getBody());
 			message = (String) t;
 		} else {
 			message = "未知格式数据..";
