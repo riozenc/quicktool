@@ -6,12 +6,12 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.riozenc.quicktool.common.util.date.DateUtil;
+import com.riozenc.quicktool.common.util.json.JSONUtil;
 import com.riozenc.quicktool.common.util.log.ExceptionLogUtil;
 import com.riozenc.quicktool.common.util.log.LogUtil;
 import com.riozenc.quicktool.common.util.log.LogUtil.LOG_TYPE;
@@ -81,15 +81,8 @@ public abstract class DefaultInterceptor extends HandlerInterceptorAdapter {
 
 		LogUtil.getLogger(LOG_TYPE.REQUEST)
 				.info("[" + DateUtil.formatDateTime(new Date()) + "]{" + httpServletRequest.getRemoteAddr() + "} 执行"
-						+ getClassMethod(object) + "[" + httpServletRequest.getMethod() + "]");
-
-		// if (RequestMethod.GET.name().equals(httpServletRequest.getMethod()))
-		// {
-		// // 只支持GET方法
-		// return true;
-		// } else {
-		// return false;
-		// }
+						+ getClassMethod(object) + "[" + httpServletRequest.getMethod() + "]" + ":{"
+						+ JSONUtil.toJsonString(httpServletRequest.getParameterMap()) + "}");
 		return true;
 
 	}
