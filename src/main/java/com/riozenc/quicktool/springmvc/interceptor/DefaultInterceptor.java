@@ -84,7 +84,6 @@ public abstract class DefaultInterceptor extends HandlerInterceptorAdapter {
 						+ getClassMethod(object) + "[" + httpServletRequest.getMethod() + "]" + ":{"
 						+ JSONUtil.toJsonString(httpServletRequest.getParameterMap()) + "}");
 		return true;
-
 	}
 
 	protected String getClassMethod(Object object) {
@@ -97,6 +96,5 @@ public abstract class DefaultInterceptor extends HandlerInterceptorAdapter {
 		} else {
 			return "执行未知操作:" + object.getClass();
 		}
-
 	}
 }
