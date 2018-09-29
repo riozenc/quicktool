@@ -20,7 +20,7 @@ public class NDateUtil {
 
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-	enum NdateFormatter {
+	public enum NdateFormatter {
 		DATE_TIME, DATE
 	}
 
