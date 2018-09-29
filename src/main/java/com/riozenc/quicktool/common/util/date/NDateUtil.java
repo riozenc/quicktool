@@ -61,6 +61,11 @@ public class NDateUtil {
 		return null;
 	}
 
+	public static String getDate(Date date, long day) {
+		return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().plusDays(day)
+				.format(DATE_TIME_FORMATTER);
+	}
+
 	/**
 	 * 
 	 * @param date
