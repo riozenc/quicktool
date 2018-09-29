@@ -49,16 +49,16 @@ public class NDateUtil {
 	 * @return
 	 */
 	public static String getDate(Date date, NdateFormatter pattern) {
-		String temp = null;
+
 		switch (pattern) {
 		case DATE: {
-			temp = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().format(DateTimeFormatter.ISO_DATE);
+			return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().format(DateTimeFormatter.ISO_DATE);
 		}
 		case DATE_TIME: {
-			temp = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().format(DATE_TIME_FORMATTER);
+			return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().format(DATE_TIME_FORMATTER);
 		}
 		}
-		return temp;
+		return null;
 	}
 
 	/**
@@ -67,7 +67,13 @@ public class NDateUtil {
 	 * @return
 	 */
 	public static Date getDate(String date) {
-		return Date.from(LocalDateTime.parse(date, DATE_TIME_FORMATTER).atZone(ZoneId.systemDefault()).toInstant());
+		if (date.length() > 10) {
+			return Date.from(LocalDateTime.parse(date, DATE_TIME_FORMATTER).atZone(ZoneId.systemDefault()).toInstant());
+		} else {
+			return Date.from(LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE)
+					.atStartOfDay(ZoneId.systemDefault()).toInstant());
+		}
+
 	}
 
 }
