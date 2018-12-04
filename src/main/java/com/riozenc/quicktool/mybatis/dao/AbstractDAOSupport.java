@@ -79,8 +79,9 @@ public abstract class AbstractDAOSupport {
 				sqlSession = SqlSessionManager.getSession(dbName, executorType);
 			}
 		}
+		
 		LogUtil.getLogger(LOG_TYPE.DB).info(
-				"[" + Thread.currentThread().getName() + "]获取SqlSession用时:" + (System.currentTimeMillis() - l) / 1000);
+				"[" + Thread.currentThread().getName() + "]获取SqlSession("+sqlSession.getConnection()+")用时:" + (System.currentTimeMillis() - l) / 1000);
 		getSqlSessionMap().put(dbName + executorType, sqlSession);
 
 		if (isProxy) {

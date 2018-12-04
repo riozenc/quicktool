@@ -78,7 +78,6 @@ public abstract class DefaultInterceptor extends HandlerInterceptorAdapter {
 	public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
 			Object object) throws Exception {
 		// TODO Auto-generated method stub
-
 		LogUtil.getLogger(LOG_TYPE.REQUEST)
 				.info("[" + DateUtil.formatDateTime(new Date()) + "]{" + httpServletRequest.getRemoteAddr() + "} 执行"
 						+ getClassMethod(object) + "[" + httpServletRequest.getMethod() + "]" + ":{"

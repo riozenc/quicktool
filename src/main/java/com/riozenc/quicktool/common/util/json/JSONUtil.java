@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -45,8 +46,8 @@ public class JSONUtil {
 
 	/**
 	 * 
-	 * @param object 对象
-	 * @param datePattern 日期格式eg:'yyyy-MM-dd HH:mm:ss' or 'yyyy-MM-dd'
+	 * @param object       对象
+	 * @param datePattern  日期格式eg:'yyyy-MM-dd HH:mm:ss' or 'yyyy-MM-dd'
 	 * @param isIgnoreNull 是否忽略domain中注解的属性
 	 * @return
 	 */
@@ -84,4 +85,9 @@ public class JSONUtil {
 		return objectMapper.readValue(json, clazz);
 	}
 
+	public static <T> T readValue(String json, TypeReference<T> typeReference)
+			throws JsonParseException, JsonMappingException, IOException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		return objectMapper.readValue(json, typeReference);
+	}
 }
