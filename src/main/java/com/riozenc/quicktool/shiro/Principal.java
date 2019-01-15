@@ -8,7 +8,7 @@ package com.riozenc.quicktool.shiro;
 import java.util.Date;
 
 public class Principal {
-	private Integer id;//
+	private Integer userId;//
 	private String userAccount; // 登录名
 	private String userName; // 姓名
 	private String phone;//
@@ -20,12 +20,12 @@ public class Principal {
 	private Date lastLoginDate;// 最后登陆时间 LAST_LOGIN_DATE datetime
 	private Date updateDate;// 最后更新时间 UPDATE_DATE datetime
 
-	public Integer getId() {
-		return id;
+	public Integer getUserId() {
+		return userId;
 	}
 
-	public void setId(Integer id) {
-		this.id = id;
+	public void setUserId(Integer userId) {
+		this.userId = userId;
 	}
 
 	public String getUserAccount() {
