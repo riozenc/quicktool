@@ -17,6 +17,6 @@ public class UserUtils {
 		if(null==principal) {
 			throw new RuntimeException("用户失效,请重新登录...");
 		}
-		return principal.getUserId();
+		return principal.getUserAccount();
 	}
 }

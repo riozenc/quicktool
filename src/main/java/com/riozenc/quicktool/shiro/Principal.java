@@ -9,7 +9,7 @@ import java.util.Date;
 
 public class Principal {
 	private Integer id;//
-	private String userId; // 登录名
+	private String userAccount; // 登录名
 	private String userName; // 姓名
 	private String phone;//
 	private String mailAddress;
@@ -28,12 +28,12 @@ public class Principal {
 		this.id = id;
 	}
 
-	public String getUserId() {
-		return userId;
+	public String getUserAccount() {
+		return userAccount;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setUserAccount(String userAccount) {
+		this.userAccount = userAccount;
 	}
 
 	public String getUserName() {
